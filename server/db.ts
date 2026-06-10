@@ -44,6 +44,14 @@ db.exec(`
     role         TEXT,
     createdAt    TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id        TEXT PRIMARY KEY,
+    username  TEXT UNIQUE NOT NULL,
+    password  TEXT NOT NULL,
+    email     TEXT UNIQUE NOT NULL,
+    createdAt TEXT NOT NULL
+  );
 `);
 
 export default db;

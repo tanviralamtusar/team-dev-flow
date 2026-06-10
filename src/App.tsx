@@ -10,6 +10,7 @@ import Board from "./components/Board";
 import StatsView from "./components/StatsView";
 import SettingsView from "./components/SettingsView";
 import ItemModal from "./components/ItemModal";
+import Auth from "./components/Auth";
 import { 
   Layers, 
   TrendingUp, 
@@ -33,21 +34,51 @@ import {
   CheckCircle2,
   WifiOff,
   Moon,
-  Sun
+  Sun,
+  LogOut,
+  User as UserIcon,
+  Loader2
 } from "lucide-react";
 
 // REST API client (SQLite backend)
 import * as api from "./api";
 
-// Current simulated user
-const CURRENT_USER = "Alam Tanvir";
-
 export default function App() {
+  // --- Auth State ---
+  const [user, setUser] = useState<any>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
   // --- Persistent Workspace States ---
   const [items, setItems] = useState<BoardItem[]>([]);
   const [columns, setColumns] = useState<Column[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [assignees, setAssignees] = useState<Assignee[]>([]);
+
+  // --- Auth Check ---
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setIsAuthChecking(false);
+        return;
+      }
+      try {
+        const u = await api.getCurrentUser();
+        setUser(u);
+      } catch {
+        api.setToken(null);
+        setUser(null);
+      } finally {
+        setIsAuthChecking(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogout = () => {
+    api.setToken(null);
+    setUser(null);
+  };
 
   // --- Theme Management ---
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -90,6 +121,7 @@ export default function App() {
 
   // --- Load all data from the REST API ---
   const fetchAllData = useCallback(async () => {
+    if (!user) return;
     try {
       const healthy = await api.checkHealth();
       if (!healthy) throw new Error("Server offline");
@@ -135,10 +167,11 @@ export default function App() {
 
   // Initial load + 15-second polling for live sync across tabs
   useEffect(() => {
+    if (!user) return;
     fetchAllData();
     pollRef.current = setInterval(fetchAllData, 15000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, [fetchAllData]);
+  }, [fetchAllData, user]);
 
   // --- Ticket Operations ---
   
@@ -171,7 +204,7 @@ export default function App() {
     const movementLog: ActivityLog = {
       id: `move-${Date.now()}`,
       timestamp: new Date().toISOString(),
-      user: CURRENT_USER,
+      user: user?.username || "Unknown",
       action: `Relocated ticket from "${oldColTitle}" into column "${newColTitle}"`,
     };
 
@@ -354,6 +387,18 @@ export default function App() {
   // Is active filters checked indicator
   const hasActiveFilters = searchQuery !== "" || selectedType !== "" || selectedPriority !== "" || selectedTag !== "" || selectedAssignee !== "";
 
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0b0f1a]">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Auth onAuthenticated={(u) => setUser(u)} />;
+  }
+
   return (
     <div id="devflow-root" className="min-h-screen bg-slate-50/50 dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
       
@@ -403,11 +448,18 @@ export default function App() {
             <div className="flex items-center gap-2.5">
               <div className="text-right hidden sm:block">
                 <span className="text-[9px] text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
-                <span className="text-xs font-semibold text-slate-200 block tracking-tight">{CURRENT_USER}</span>
+                <span className="text-xs font-semibold text-slate-200 block tracking-tight">{user?.username}</span>
               </div>
               <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm">
-                AT
+                {user?.username?.substring(0, 2).toUpperCase()}
               </div>
+              <button
+                onClick={handleLogout}
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-red-400 hover:bg-red-900/20 transition-all cursor-pointer"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -691,7 +743,7 @@ export default function App() {
           }}
           onSave={handleSaveItem}
           onDelete={activeItem ? handleDeleteItem : undefined}
-          currentUser={CURRENT_USER}
+          currentUser={user?.username || "Unknown"}
         />
       )}
 

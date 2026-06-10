@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -5,11 +6,13 @@ import { fileURLToPath } from "url";
 import { seedDatabase } from "./seed.js";
 
 // Route imports
+import authRouter from "./routes/auth.js";
 import itemsRouter from "./routes/items.js";
 import columnsRouter from "./routes/columns.js";
 import tagsRouter from "./routes/tags.js";
 import assigneesRouter from "./routes/assignees.js";
 import profilesRouter from "./routes/profiles.js";
+import { authenticateToken } from "./middleware/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 4000;
@@ -26,11 +29,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(UPLOADS_DIR));
 
 // ── API Routes ─────────────────────────────────────────────────────────────────
-app.use("/api/items", itemsRouter);
-app.use("/api/columns", columnsRouter);
-app.use("/api/tags", tagsRouter);
-app.use("/api/assignees", assigneesRouter);
-app.use("/api/profiles", profilesRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/items", authenticateToken, itemsRouter);
+app.use("/api/columns", authenticateToken, columnsRouter);
+app.use("/api/tags", authenticateToken, tagsRouter);
+app.use("/api/assignees", authenticateToken, assigneesRouter);
+app.use("/api/profiles", authenticateToken, profilesRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {

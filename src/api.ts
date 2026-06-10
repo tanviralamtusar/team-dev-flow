@@ -7,8 +7,33 @@ import { BoardItem, Column, Tag, Assignee, Profile } from "./types";
 
 const BASE = "/api";
 
-async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${url}`, options);
+let authToken: string | null = localStorage.getItem("auth_token");
+
+export const setToken = (token: string | null) => {
+  authToken = token;
+  if (token) {
+    localStorage.setItem("auth_token", token);
+  } else {
+    localStorage.removeItem("auth_token");
+  }
+};
+
+async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const headers = (options.headers as Record<string, string>) || {};
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  const res = await fetch(`${BASE}${url}`, {
+    ...options,
+    headers,
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    // Optional: Clear token on auth error
+    // setToken(null);
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error(err.error || `HTTP ${res.status}`);
@@ -23,6 +48,16 @@ function json(method: string, body: unknown): RequestInit {
     body: JSON.stringify(body),
   };
 }
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+export const login = (data: any) => 
+  request<{ token: string; user: any }>("/auth/login", json("POST", data));
+
+export const signup = (data: any) => 
+  request<{ token: string; user: any }>("/auth/signup", json("POST", data));
+
+export const getCurrentUser = () => 
+  request<any>("/auth/me");
 
 // ── Health ────────────────────────────────────────────────────────────────────
 export async function checkHealth(): Promise<boolean> {
@@ -96,8 +131,15 @@ export async function uploadAvatar(
 ): Promise<{ avatarUrl: string; profile: Profile }> {
   const formData = new FormData();
   formData.append("avatar", file);
+  
+  const headers: Record<string, string> = {};
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
   const res = await fetch(`${BASE}/profiles/${id}/avatar`, {
     method: "POST",
+    headers,
     body: formData,
   });
   if (!res.ok) {
