@@ -105,31 +105,31 @@ export default function Board({
             onDrop={(e) => handleDrop(e, col.id)}
             className={`flex-1 min-w-[285px] max-w-[350px] snap-always snap-start shrink-0 flex flex-col rounded-2xl border transition-all duration-200 ${
               isTarget 
-                ? "bg-indigo-50/40 border-indigo-200 shadow-sm" 
-                : "bg-slate-50/40 border-slate-100 shadow-xs"
+                ? "bg-indigo-50/40 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800/50 shadow-sm" 
+                : "bg-slate-50/40 dark:bg-slate-900/40 border-slate-100 dark:border-slate-800/50 shadow-xs"
             }`}
           >
             {/* Column Header */}
-            <div className={`p-4 border-b border-slate-150/60 rounded-t-2xl flex items-center justify-between col-head bg-white`}>
+            <div className={`p-4 border-b border-slate-150/60 dark:border-slate-800/60 rounded-t-2xl flex items-center justify-between col-head bg-white dark:bg-[#151b2b]`}>
               <div className="flex items-center gap-2 min-w-0">
-                <span className={`px-2.5 py-1 text-[11px] font-display font-extrabold tracking-wider uppercase rounded-lg border-0 bg-slate-100/60 ${col.textClass}`}>
+                <span className={`px-2.5 py-1 text-[11px] font-display font-extrabold tracking-wider uppercase rounded-lg border-0 bg-slate-100/60 dark:bg-slate-800/60 ${col.textClass}`}>
                   {col.title}
                 </span>
-                <span className="text-[11px] text-slate-400 font-bold font-mono bg-slate-100/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] text-slate-400 dark:text-slate-500 font-bold font-mono bg-slate-100/60 dark:bg-slate-800/60 px-2 py-0.5 rounded-full">
                   {columnItems.length}
                 </span>
               </div>
               
               <div className="flex items-center gap-1.5">
                 {columnPoints > 0 && (
-                  <span className="text-[10px] font-bold font-mono text-slate-500 bg-slate-50/50 px-2 py-0.5 rounded-lg">
+                  <span className="text-[10px] font-bold font-mono text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/40 px-2 py-0.5 rounded-lg">
                     {columnPoints} PT
                   </span>
                 )}
                 <button
                   id={`btn-add-ticket-${col.id}`}
                   onClick={() => onAddItem(col.id)}
-                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 bg-white rounded-lg border border-slate-200 transition-all cursor-pointer"
+                  className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 bg-white dark:bg-[#151b2b] rounded-lg border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
                   title={`Add ticket to ${col.title}`}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -152,9 +152,9 @@ export default function Board({
               ))}
 
               {columnItems.length === 0 && (
-                <div className="h-44 border border-dashed border-slate-200 bg-slate-50/20 rounded-xl flex flex-col items-center justify-center p-4 text-center text-slate-400">
-                  <span className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest mb-1">Queue Empty</span>
-                  <p className="text-[10px] leading-relaxed max-w-[170px] text-slate-400">
+                <div className="h-44 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/20 rounded-xl flex flex-col items-center justify-center p-4 text-center text-slate-400 dark:text-slate-600">
+                  <span className="text-xs font-bold font-mono text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-1">Queue Empty</span>
+                  <p className="text-[10px] leading-relaxed max-w-[170px] text-slate-400 dark:text-slate-600">
                     Drag items here or click "+" to draft details.
                   </p>
                 </div>
@@ -162,11 +162,11 @@ export default function Board({
             </div>
             
             {/* Quick footer helper */}
-            <div className="p-2 border-t border-slate-150/60 text-center bg-white rounded-b-2xl">
+            <div className="p-2 border-t border-slate-150/60 dark:border-slate-800/60 text-center bg-white dark:bg-[#151b2b] rounded-b-2xl">
               <button
                 id={`btn-col-bottom-add-${col.id}`}
                 onClick={() => onAddItem(col.id)}
-                className="w-full py-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-600 bg-slate-50/65 hover:bg-slate-50 rounded-xl border-0 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                className="w-full py-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50/65 dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl border-0 transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 CREATE TICKET

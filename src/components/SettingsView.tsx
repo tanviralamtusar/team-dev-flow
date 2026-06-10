@@ -167,13 +167,13 @@ export default function SettingsView({
     <div id="settings-panel-grid" className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
       
       {/* LEFT: Teammates Settings inside elegant card */}
-      <div className="lg:col-span-6 bg-white border border-slate-100 p-6 rounded-2xl space-y-6 shadow-xs">
+      <div className="lg:col-span-6 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 p-6 rounded-2xl space-y-6 shadow-xs">
         <div>
-          <h3 className="text-sm font-display font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-5 h-5 text-indigo-600" />
+          <h3 className="text-sm font-display font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+            <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Development Teammates
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Configure human assignees to model delivery capabilities and workload stats.
           </p>
         </div>
@@ -183,21 +183,21 @@ export default function SettingsView({
           {assignees.map((as) => (
             <div 
               key={as.id} 
-              className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-slate-50/50 hover:bg-white hover:shadow-xs transition-all duration-150"
+              className="flex items-center justify-between p-3 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-150"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className={`w-10 h-10 rounded-xl border border-transparent flex items-center justify-center font-bold text-sm uppercase shrink-0 ${as.avatarColor}`}>
                   {as.name.split(" ").map(w => w[0]).join("")}
                 </div>
                 <div className="min-w-0">
-                  <span className="text-xs font-bold text-slate-900 block truncate">{as.name}</span>
-                  <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono font-semibold uppercase">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">{as.name}</span>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-mono font-semibold uppercase">
                     <span className="flex items-center gap-0.5">
-                      <Briefcase className="w-3 h-3 text-slate-400" />
+                      <Briefcase className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                       {as.role}
                     </span>
                     <span className="flex items-center gap-0.5">
-                      <Mail className="w-3 h-3 text-slate-400" />
+                      <Mail className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                       {as.email}
                     </span>
                   </div>
@@ -206,7 +206,7 @@ export default function SettingsView({
               <button 
                 type="button" 
                 onClick={() => handleDeleteMember(as.id, as.name)}
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-100 bg-white shadow-xs transition-colors cursor-pointer"
+                className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#1e293b] shadow-xs transition-colors cursor-pointer"
                 title="Remove Teammate"
               >
                 <Trash className="w-4 h-4" />
@@ -216,12 +216,12 @@ export default function SettingsView({
         </div>
 
         {/* Add Teammate Form Panel */}
-        <form onSubmit={handleAddMember} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-3">
-          <span className="text-[10px] font-bold text-slate-400 font-mono tracking-wider uppercase block">PROVISION TEAMMATE</span>
+        <form onSubmit={handleAddMember} className="bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
+          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider uppercase block">PROVISION TEAMMATE</span>
           
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label htmlFor="member-name-input" className="text-[10px] text-slate-500 font-mono font-semibold uppercase">FULL NAME</label>
+              <label htmlFor="member-name-input" className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-semibold uppercase">FULL NAME</label>
               <input
                 id="member-name-input"
                 type="text"
@@ -229,38 +229,38 @@ export default function SettingsView({
                 placeholder="e.g. Rachel Green"
                 value={newMemberName}
                 onChange={(e) => setNewMemberName(e.target.value)}
-                className="w-full bg-white border border-slate-200 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 font-medium text-slate-600"
+                className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300"
               />
             </div>
             
             <div className="space-y-1">
-              <label htmlFor="member-role-input" className="text-[10px] text-slate-500 font-mono font-semibold uppercase">TEAM ROLE</label>
+              <label htmlFor="member-role-input" className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-semibold uppercase">TEAM ROLE</label>
               <input
                 id="member-role-input"
                 type="text"
                 placeholder="e.g. Senior Frontend"
                 value={newMemberRole}
                 onChange={(e) => setNewMemberRole(e.target.value)}
-                className="w-full bg-white border border-slate-200 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 font-medium text-slate-600"
+                className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="member-email-input" className="text-[10px] text-slate-500 font-mono font-semibold uppercase">EMAIL ADDRESS</label>
+            <label htmlFor="member-email-input" className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-semibold uppercase">EMAIL ADDRESS</label>
             <input
               id="member-email-input"
               type="email"
               placeholder="e.g. rachel@company.com"
               value={newMemberEmail}
               onChange={(e) => setNewMemberEmail(e.target.value)}
-              className="w-full bg-white border border-slate-200 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 font-medium text-slate-600"
+              className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300"
             />
           </div>
 
           {/* Quick Avatar Color Selector */}
           <div className="space-y-1">
-            <span className="text-[10px] text-slate-500 font-mono font-semibold uppercase block">AVATAR IDENTITY SLAT</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-semibold uppercase block">AVATAR IDENTITY SLAT</span>
             <div className="flex gap-1.5 py-1">
               {AVATAR_COLORS.map((col) => (
                 <button
@@ -289,13 +289,13 @@ export default function SettingsView({
       <div className="lg:col-span-6 space-y-6">
         
         {/* Custom Tags management sheet */}
-        <div className="bg-white border border-slate-100 p-6 rounded-2xl space-y-6 shadow-xs">
+        <div className="bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 p-6 rounded-2xl space-y-6 shadow-xs">
           <div>
-            <h3 className="text-sm font-display font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <TagIcon className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-sm font-display font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+              <TagIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Custom Tags Taxonomy
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Create custom classified badges to search, colorize, and filter board tickets.
             </p>
           </div>
@@ -305,13 +305,13 @@ export default function SettingsView({
             {tags.map((tg) => (
               <span 
                 key={tg.id} 
-                className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl border border-slate-100 text-[10px] font-bold uppercase shadow-xs ${tg.bgClass}`}
+                className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl border border-slate-100 dark:border-slate-700 text-[10px] font-bold uppercase shadow-xs ${tg.bgClass}`}
               >
                 {tg.name}
                 <button 
                   type="button"
                   onClick={() => handleDeleteTag(tg.id, tg.name)}
-                  className="p-0.5 text-slate-650 hover:text-rose-650 text-slate-600 hover:text-rose-600 rounded cursor-pointer animate-fade-in"
+                  className="p-0.5 text-slate-650 dark:text-slate-300 hover:text-rose-650 dark:hover:text-rose-400 text-slate-600 rounded cursor-pointer animate-fade-in"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -320,8 +320,8 @@ export default function SettingsView({
           </div>
 
           {/* New Tag Input */}
-          <form onSubmit={handleAddTag} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-3">
-            <span className="text-[10px] font-bold text-slate-400 font-mono tracking-wider uppercase block">PROVISION SYSTEM TAG</span>
+          <form onSubmit={handleAddTag} className="bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider uppercase block">PROVISION SYSTEM TAG</span>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="space-y-1">
@@ -332,7 +332,7 @@ export default function SettingsView({
                   placeholder="e.g. Hotfix, Mobile"
                   value={newTagName}
                   onChange={(e) => setNewTagName(e.target.value)}
-                  className="w-full bg-white border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-400 font-medium text-slate-600 placeholder-slate-400"
+                  className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
 
@@ -344,7 +344,7 @@ export default function SettingsView({
                   const m = COLOR_TEMPLATES.find((col) => col.id === e.target.value);
                   if (m) setSelectedColorTemplate(m);
                 }}
-                className="bg-white border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-400 font-mono font-medium text-slate-600 cursor-pointer"
+                className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-mono font-medium text-slate-600 dark:text-slate-300 cursor-pointer"
               >
                 {COLOR_TEMPLATES.map((tmpl) => (
                   <option key={tmpl.id} value={tmpl.id}>{tmpl.name}</option>
@@ -363,13 +363,13 @@ export default function SettingsView({
         </div>
 
         {/* Dynamic Workflow Column management */}
-        <div className="bg-white border border-slate-100 p-6 rounded-2xl space-y-6 shadow-xs animate-fade-in">
+        <div className="bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 p-6 rounded-2xl space-y-6 shadow-xs animate-fade-in">
           <div>
-            <h3 className="text-sm font-display font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <Hash className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-sm font-display font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+              <Hash className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Workflow Column Configuration
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Refinement controls for adding custom tracking queues or resetting board configurations.
             </p>
           </div>
@@ -378,12 +378,12 @@ export default function SettingsView({
             {columns.map((c) => (
               <div 
                 key={c.id} 
-                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 text-xs font-bold font-mono shadow-xs"
+                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 text-xs font-bold font-mono shadow-xs"
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600 border-0" />
-                  <span className="text-slate-800 font-medium font-sans">{c.title}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">({c.id})</span>
+                  <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-500 border-0" />
+                  <span className="text-slate-800 dark:text-slate-200 font-medium font-sans">{c.title}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">({c.id})</span>
                 </div>
                 
                 {/* Prevent delete baseline columns */}
@@ -391,12 +391,12 @@ export default function SettingsView({
                   <button 
                     type="button" 
                     onClick={() => handleDeleteColumn(c.id, c.title)}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-100 bg-white transition-colors cursor-pointer shadow-xs"
+                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#1e293b] transition-colors cursor-pointer shadow-xs"
                   >
                     <Trash className="w-3.5 h-3.5" />
                   </button>
                 ) : (
-                  <span className="text-[9px] text-slate-450 font-mono font-semibold uppercase tracking-wider bg-slate-100 px-2.5 py-1 rounded-xl text-slate-400">Baseline lock</span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono font-semibold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">Baseline lock</span>
                 )}
               </div>
             ))}
@@ -410,11 +410,11 @@ export default function SettingsView({
               placeholder="e.g. Needs Design, QA Hold"
               value={newColTitle}
               onChange={(e) => setNewColTitle(e.target.value)}
-              className="flex-1 bg-white border border-slate-200 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 font-medium text-slate-600"
+              className="flex-1 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-medium text-slate-600 dark:text-slate-300"
             />
             <button
               type="submit"
-              className="px-4 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 text-xs font-semibold uppercase tracking-wider rounded-xl border border-transparent shadow-xs hover:border-transparent flex items-center gap-1 transition-all cursor-pointer"
+              className="px-4 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider rounded-xl border border-transparent dark:border-slate-700 shadow-xs hover:border-transparent flex items-center gap-1 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               Add Column
@@ -422,10 +422,10 @@ export default function SettingsView({
           </form>
 
           {/* RESET SYSTEM */}
-          <div className="border-t border-slate-100 pt-4 flex justify-between items-center bg-rose-50/20 p-4 rounded-2xl border border-dashed border-rose-300 shadow-xs">
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex justify-between items-center bg-rose-50/20 dark:bg-rose-950/10 p-4 rounded-2xl border border-dashed border-rose-300 dark:border-rose-900/40 shadow-xs">
             <div>
-              <span className="text-xs font-semibold text-slate-900 uppercase tracking-wide block">Workspace Reset</span>
-              <span className="text-[10px] text-slate-400 font-medium block leading-tight">Recharge default layout workspace parameters.</span>
+              <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide block">Workspace Reset</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium block leading-tight">Recharge default layout workspace parameters.</span>
             </div>
             <button
               onClick={() => {
@@ -433,7 +433,7 @@ export default function SettingsView({
                   onResetBoard();
                 }
               }}
-              className="p-2 px-3.5 bg-rose-55 hover:bg-rose-600 text-rose-850 hover:text-white border border-rose-100 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1 text-rose-800"
+              className="p-2 px-3.5 bg-white dark:bg-[#151b2b] hover:bg-rose-600 dark:hover:bg-rose-600 text-rose-800 dark:text-rose-400 hover:text-white dark:hover:text-white border border-rose-100 dark:border-rose-900/50 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-xs"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Reset Workspace

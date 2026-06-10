@@ -31,7 +31,9 @@ import {
   Filter,
   RefreshCw,
   CheckCircle2,
-  WifiOff
+  WifiOff,
+  Moon,
+  Sun
 } from "lucide-react";
 
 // REST API client (SQLite backend)
@@ -46,6 +48,26 @@ export default function App() {
   const [columns, setColumns] = useState<Column[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [assignees, setAssignees] = useState<Assignee[]>([]);
+
+  // --- Theme Management ---
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("dev_board_theme");
+    if (saved) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDarkMode) {
+      root.classList.add("dark");
+      localStorage.setItem("dev_board_theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("dev_board_theme", "light");
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   // API / server connectivity
   const [isServerOnline, setIsServerOnline] = useState(true);
@@ -333,10 +355,10 @@ export default function App() {
   const hasActiveFilters = searchQuery !== "" || selectedType !== "" || selectedPriority !== "" || selectedTag !== "" || selectedAssignee !== "";
 
   return (
-    <div id="devflow-root" className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900 antialiased select-none">
+    <div id="devflow-root" className="min-h-screen bg-slate-50/50 dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
       
       {/* Upper Unified Premium Header - Minimalist styling with responsive micro items */}
-      <header className="bg-slate-900 text-white border-b border-slate-800/10 shadow-xs backdrop-blur-md">
+      <header className="bg-slate-900 dark:bg-[#080c14] text-white border-b border-slate-800/10 dark:border-slate-800/50 shadow-xs backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
@@ -370,13 +392,22 @@ export default function App() {
           </div>
 
           {/* Connected User Badge */}
-          <div className="flex items-center gap-2.5 font-sans">
-            <div className="text-right hidden sm:block">
-              <span className="text-[9px] text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
-              <span className="text-xs font-semibold text-slate-200 block tracking-tight">{CURRENT_USER}</span>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm">
-              AT
+          <div className="flex items-center gap-4 font-sans">
+            <button
+              onClick={toggleDarkMode}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer"
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <div className="flex items-center gap-2.5">
+              <div className="text-right hidden sm:block">
+                <span className="text-[9px] text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
+                <span className="text-xs font-semibold text-slate-200 block tracking-tight">{CURRENT_USER}</span>
+              </div>
+              <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm">
+                AT
+              </div>
             </div>
           </div>
         </div>
@@ -386,17 +417,17 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
         
         {/* Navigation Action combined block */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-100 p-4 rounded-2xl shadow-xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-4 rounded-2xl shadow-xs">
           
           {/* Active Navigation Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100/60 p-1 rounded-xl w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-slate-100/60 dark:bg-slate-800/40 p-1 rounded-xl w-full sm:w-auto">
             <button
               id="tab-board"
               onClick={() => setActiveTab("board")}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
                 activeTab === "board" 
-                  ? "bg-slate-950 text-white font-bold" 
-                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-100/60"
+                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -407,8 +438,8 @@ export default function App() {
               onClick={() => setActiveTab("stats")}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
                 activeTab === "stats" 
-                  ? "bg-slate-950 text-white font-bold" 
-                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-100/60"
+                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
               }`}
             >
               <TrendingUp className="w-3.5 h-3.5" />
@@ -419,8 +450,8 @@ export default function App() {
               onClick={() => setActiveTab("settings")}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
                 activeTab === "settings" 
-                  ? "bg-slate-955 bg-slate-950 text-white font-bold" 
-                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-100/60"
+                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
               }`}
             >
               <Settings className="w-3.5 h-3.5" />
@@ -434,32 +465,32 @@ export default function App() {
             <div className="relative group shrink-0">
               <button
                 id="btn-trigger-exception"
-                className="px-3.5 py-2.5 bg-white hover:bg-slate-50/60 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                className="px-3.5 py-2.5 bg-white dark:bg-[#1e293b] hover:bg-slate-50/60 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
                 <Zap className="w-3.5 h-3.5 text-indigo-505" />
                 Trigger Crash Hook
               </button>
               
               {/* Dropdown Options List */}
-              <div className="absolute right-0 mt-1.5 w-56 bg-white border border-slate-100 rounded-xl shadow-md p-2 hidden group-hover:block hover:block z-20">
-                <p className="text-[10px] text-slate-400 font-mono p-2 border-b border-slate-100">SIMULATE REAL EXCEPTION</p>
+              <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-700 rounded-xl shadow-md p-2 hidden group-hover:block hover:block z-20">
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono p-2 border-b border-slate-100 dark:border-slate-700">SIMULATE REAL EXCEPTION</p>
                 <button 
                   onClick={() => handleSimulateErrorAlert("redis_crash")}
-                  className="w-full text-left p-2 hover:bg-rose-50 text-xs font-medium text-slate-700 rounded-lg flex items-center gap-1.5"
+                  className="w-full text-left p-2 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg flex items-center gap-1.5"
                 >
                   <Flame className="w-3.5 h-3.5 text-rose-500" />
                   Redis Cache OOM Crash
                 </button>
                 <button 
                   onClick={() => handleSimulateErrorAlert("api_500")}
-                  className="w-full text-left p-2 hover:bg-amber-50 text-xs font-medium text-slate-700 rounded-lg flex items-center gap-1.5"
+                  className="w-full text-left p-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg flex items-center gap-1.5"
                 >
                   <AlertOctagon className="w-3.5 h-3.5 text-amber-500" />
                   API 504 Pricing Gateway
                 </button>
                 <button 
                   onClick={() => handleSimulateErrorAlert("qa_regression")}
-                  className="w-full text-left p-2 hover:bg-sky-50 text-xs font-medium text-slate-700 rounded-lg flex items-center gap-1.5"
+                  className="w-full text-left p-2 hover:bg-sky-50 dark:hover:bg-sky-900/20 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg flex items-center gap-1.5"
                 >
                   <Bug className="w-3.5 h-3.5 text-sky-500" />
                   Firefox Touch Regression
@@ -485,19 +516,19 @@ export default function App() {
 
         {/* Board Search and Filtering Utility Bar */}
         {activeTab === "board" && (
-          <div className="bg-white border border-slate-100 p-4 rounded-2xl shadow-xs flex flex-col gap-3">
+          <div className="bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-4 rounded-2xl shadow-xs flex flex-col gap-3">
             <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
               
               {/* Search Element input */}
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="global-search-query"
                   type="text"
                   placeholder="Query ticket name, description guideline, or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-50/60 border border-slate-200 text-xs rounded-xl pl-10 pr-4 py-2.5 outline-none focus:border-indigo-400 focus:bg-white transition-all text-slate-600 placeholder-slate-400/60 shadow-xs"
+                  className="w-full bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-10 pr-4 py-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] transition-all text-slate-600 dark:text-slate-300 placeholder-slate-400/60 shadow-xs"
                 />
               </div>
 
@@ -509,7 +540,7 @@ export default function App() {
                   title="Filter type"
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="bg-slate-50/60 border border-slate-200 text-xs text-slate-600 rounded-xl p-2.5 outline-none focus:border-indigo-405 focus:bg-white cursor-pointer shadow-xs"
+                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
                   <option value="">All Issue Types</option>
                   <option value={ItemType.TASK}>Task</option>
@@ -523,7 +554,7 @@ export default function App() {
                   title="Filter priority"
                   value={selectedPriority}
                   onChange={(e) => setSelectedPriority(e.target.value)}
-                  className="bg-slate-50/60 border border-slate-200 text-xs text-slate-600 rounded-xl p-2.5 outline-none focus:border-indigo-405 focus:bg-white cursor-pointer shadow-xs"
+                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
                   <option value="">All Priorities</option>
                   <option value={Priority.URGENT}>Urgent</option>
@@ -537,7 +568,7 @@ export default function App() {
                   title="Filter assignee"
                   value={selectedAssignee}
                   onChange={(e) => setSelectedAssignee(e.target.value)}
-                  className="bg-slate-50/60 border border-slate-200 text-xs text-slate-600 rounded-xl p-2.5 outline-none focus:border-indigo-405 focus:bg-white cursor-pointer shadow-xs"
+                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
                   <option value="">All Teammates</option>
                   {assignees.map((as) => (
@@ -561,8 +592,8 @@ export default function App() {
             </div>
 
             {/* Quick Tag Filtering Toggles Row */}
-            <div className="flex items-center gap-2 border-t border-slate-50 pt-3 overflow-x-auto select-none no-scrollbar">
-              <span className="text-[10px] font-bold text-slate-400 font-mono tracking-wider flex items-center gap-shrink-0">
+            <div className="flex items-center gap-2 border-t border-slate-50 dark:border-slate-800/60 pt-3 overflow-x-auto select-none no-scrollbar">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider flex items-center gap-shrink-0">
                 <Filter className="w-3 h-3 text-slate-400 mr-1" />
                 TAG CLASSIFICATION:
               </span>
@@ -572,8 +603,8 @@ export default function App() {
                   onClick={() => setSelectedTag("")}
                   className={`px-3 py-1 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer ${
                     selectedTag === "" 
-                      ? "bg-slate-900 text-white shadow-xs" 
-                      : "bg-slate-50/60 text-slate-500 border border-slate-100 hover:border-slate-200 hover:bg-white transition-all font-semibold"
+                      ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-xs" 
+                      : "bg-slate-50/60 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 transition-all font-semibold"
                   }`}
                 >
                   ALL
@@ -586,7 +617,7 @@ export default function App() {
                     className={`px-2.5 py-1 text-[10px] uppercase border transition-all cursor-pointer font-bold ${
                       selectedTag === t.id 
                         ? `${t.bgClass} border-transparent shadow-xs font-bold rounded-xl` 
-                        : "bg-slate-50/60 text-slate-450 text-slate-400 border border-slate-100 hover:border-slate-200 hover:bg-white rounded-xl transition-all font-semibold"
+                        : "bg-slate-50/60 dark:bg-slate-800/40 text-slate-450 dark:text-slate-400 text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all font-semibold"
                     }`}
                   >
                     {t.name}
@@ -665,19 +696,19 @@ export default function App() {
       )}
 
       {/* Pure Human Footer Credits */}
-      <footer className="bg-white border-t border-slate-100 py-6 text-center text-slate-500 text-xs mt-auto">
+      <footer className="bg-white dark:bg-[#080c14] border-t border-slate-100 dark:border-slate-800/50 py-6 text-center text-slate-500 text-xs mt-auto">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3 font-mono uppercase tracking-wider text-[11px]">
-          <p className="leading-tight text-slate-400 font-bold">
+          <p className="leading-tight text-slate-400 dark:text-slate-500 font-bold">
             Dev Kanban Board &copy; 2026. Live Operations Database.
           </p>
           <div className="flex items-center gap-4 text-[11px]">
-            <span className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl text-slate-400">
+            <span className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700 px-3 py-1.5 rounded-xl text-slate-400">
               <Database className="w-3.5 h-3.5 text-slate-400 animate-pulse" />
               SQLite — Local Database
             </span>
-            <span className="text-slate-200">|</span>
-            <span className={`flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl ${
-              isServerOnline ? "text-emerald-600" : "text-rose-500"
+            <span className="text-slate-200 dark:text-slate-700">|</span>
+            <span className={`flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700 px-3 py-1.5 rounded-xl ${
+              isServerOnline ? "text-emerald-600 dark:text-emerald-500" : "text-rose-500 dark:text-rose-400"
             }`}>
               {isServerOnline
                 ? <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> API Online</>

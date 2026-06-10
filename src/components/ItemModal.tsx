@@ -236,22 +236,22 @@ export default function ItemModal({
   };
 
   return (
-    <div id="item-modal-overlay" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto font-sans">
+    <div id="item-modal-overlay" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-xs overflow-y-auto font-sans">
       <div 
         id="item-modal-container"
-        className="relative w-full max-w-3xl bg-white rounded-2xl shadow-geom-lg border border-slate-100 overflow-hidden flex flex-col my-8 max-h-[90vh] animate-fade-in"
+        className="relative w-full max-w-3xl bg-white dark:bg-[#151b2b] rounded-2xl shadow-geom-lg border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col my-8 max-h-[90vh] animate-fade-in"
       >
         {/* Modal Title Banner */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+        <div className="flex items-center justify-between px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <span className="p-2 bg-indigo-50/50 text-indigo-600 rounded-lg">
+            <span className="p-2 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
               <Hash className="w-5 h-5" />
             </span>
             <div>
-              <h3 className="text-sm font-display font-extrabold text-slate-800 uppercase tracking-wider">
+              <h3 className="text-sm font-display font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
                 {item ? "Inspect Board Ticket" : "Provision New Development Ticket"}
               </h3>
-              <p className="text-[10px] text-slate-400 font-mono font-medium uppercase mt-0.5">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-medium uppercase mt-0.5">
                 {item ? `Ticket Identifier: ${item.id}` : "Configure parameters to expand board coverage"}
               </p>
             </div>
@@ -259,7 +259,7 @@ export default function ItemModal({
           <button 
             id="close-modal-x"
             onClick={onClose}
-            className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-705 transition-all cursor-pointer bg-white"
+            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300 transition-all cursor-pointer bg-white dark:bg-[#151b2b]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -270,7 +270,7 @@ export default function ItemModal({
           
           {/* Main Title Input */}
           <div className="space-y-1.5">
-            <label htmlFor="ticket-title-input" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">
+            <label htmlFor="ticket-title-input" className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">
               Ticket Name
             </label>
             <input 
@@ -280,7 +280,7 @@ export default function ItemModal({
               placeholder="e.g., Fix database isolation transaction levels"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full text-sm font-bold text-slate-800 placeholder-slate-400 bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-400 transition-all"
+              className="w-full text-sm font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 transition-all"
             />
           </div>
 
@@ -291,7 +291,7 @@ export default function ItemModal({
               
               {/* Description Textarea */}
               <div className="space-y-1.5">
-                <label htmlFor="ticket-description" className="text-[10px] font-black text-slate-905 uppercase tracking-widest font-mono block">
+                <label htmlFor="ticket-description" className="text-[10px] font-black text-slate-905 dark:text-slate-300 uppercase tracking-widest font-mono block">
                   Description
                 </label>
                 <textarea 
@@ -300,13 +300,13 @@ export default function ItemModal({
                   placeholder="Provide brief engineering guidelines, logs format details, and steps to replicate."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full text-xs text-slate-805 text-slate-800 placeholder-slate-400 bg-white border border-slate-200 rounded-md p-4 outline-none focus:border-indigo-400 resize-y font-sans leading-relaxed"
+                  className="w-full text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 rounded-md p-4 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 resize-y font-sans leading-relaxed"
                 />
               </div>
 
               {/* Image Attachments Drag-and-Drop Dropzone & Click-to-Upload Selector */}
               <div className="space-y-2">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-mono block">
+                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">
                   IMAGE ATTACHMENTS
                 </span>
                 
@@ -318,8 +318,8 @@ export default function ItemModal({
                   onClick={() => fileInputRef.current?.click()}
                   className={`border border-dashed p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
                     isDragActive 
-                      ? "border-indigo-401 border-indigo-500 bg-indigo-50/20" 
-                      : "border-slate-200 bg-slate-50/20 hover:bg-slate-50 hover:border-slate-350"
+                      ? "border-indigo-500 bg-indigo-50/20 dark:bg-indigo-900/20" 
+                      : "border-slate-200 dark:border-slate-700 bg-slate-50/20 dark:bg-slate-900/20 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-350 dark:hover:border-slate-600"
                   }`}
                 >
                   <input 
@@ -330,16 +330,16 @@ export default function ItemModal({
                     multiple 
                     className="hidden" 
                   />
-                  <Upload className="w-6 h-6 text-slate-400 mb-1.5" />
-                  <span className="text-xs font-semibold text-slate-700">Drag & drop images here, or <span className="text-indigo-650 font-bold hover:underline">browse</span></span>
-                  <span className="text-[9px] text-slate-400 mt-1">Lightweight optimised snapshots (JPG, PNG, GIF)</span>
+                  <Upload className="w-6 h-6 text-slate-400 dark:text-slate-500 mb-1.5" />
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Drag & drop images here, or <span className="text-indigo-650 dark:text-indigo-400 font-bold hover:underline">browse</span></span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Lightweight optimised snapshots (JPG, PNG, GIF)</span>
                 </div>
 
                 {/* Thumbnail Preview Area */}
                 {images.length > 0 && (
                   <div className="grid grid-cols-4 gap-2 mt-2 font-mono">
                     {images.map((img, idx) => (
-                      <div key={idx} className="relative group/img aspect-video rounded-lg overflow-hidden border border-slate-100 bg-slate-50 shadow-sm">
+                      <div key={idx} className="relative group/img aspect-video rounded-lg overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-sm">
                         <img src={img} alt="Attachment thumbnail" className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -360,12 +360,12 @@ export default function ItemModal({
                 
                 {/* Column Selection Status */}
                 <div className="space-y-1">
-                  <label htmlFor="column-select" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">COLUMN STATUS</label>
+                  <label htmlFor="column-select" className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">COLUMN STATUS</label>
                   <select
                     id="column-select"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full bg-white border border-slate-200 text-slate-700 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 font-semibold cursor-pointer transition-all"
+                    className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-semibold cursor-pointer transition-all"
                   >
                     {columns.map((col) => (
                       <option key={col.id} value={col.id}>{col.title}</option>
@@ -375,12 +375,12 @@ export default function ItemModal({
 
                 {/* Team Assignee Picker */}
                 <div className="space-y-1">
-                  <label htmlFor="assignee-select" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">TEAM ASSIGNEE</label>
+                  <label htmlFor="assignee-select" className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">TEAM ASSIGNEE</label>
                   <select
                     id="assignee-select"
                     value={assigneeId}
                     onChange={(e) => setAssigneeId(e.target.value)}
-                    className="w-full bg-white border border-slate-200 text-slate-700 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 font-semibold cursor-pointer transition-all"
+                    className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-semibold cursor-pointer transition-all"
                   >
                     <option value="">Unassigned</option>
                     {assignees.map((as) => (
@@ -393,7 +393,7 @@ export default function ItemModal({
 
                 {/* Estimate Points */}
                 <div className="space-y-1">
-                  <label htmlFor="points-input" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">STORY ESTIMATES (PT)</label>
+                  <label htmlFor="points-input" className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">STORY ESTIMATES (PT)</label>
                   <input
                     id="points-input"
                     type="number"
@@ -402,19 +402,19 @@ export default function ItemModal({
                     placeholder="e.g. 1, 3, 5, 8"
                     value={storyPoints === 0 ? "" : storyPoints}
                     onChange={(e) => setStoryPoints(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 text-slate-700 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 font-bold transition-all"
+                    className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-bold transition-all"
                   />
                 </div>
 
                 {/* Due Date Indicator */}
                 <div className="space-y-1">
-                  <label htmlFor="due-date-input" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">TARGET DEADLINE</label>
+                  <label htmlFor="due-date-input" className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">TARGET DEADLINE</label>
                   <input
                     id="due-date-input"
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-white border border-slate-200 text-slate-700 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 font-mono font-bold transition-all"
+                    className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl p-2.5 text-xs outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-mono font-bold transition-all"
                   />
                 </div>
 
@@ -422,7 +422,7 @@ export default function ItemModal({
 
               {/* Subtasks Section */}
               <div className="space-y-3">
-                <span className="text-[10px] font-bold text-slate-450 text-slate-400 uppercase tracking-widest font-mono block">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">
                   SUBTASKS INTEGRATION
                 </span>
 
@@ -432,23 +432,23 @@ export default function ItemModal({
                     {subtasks.map((sub) => (
                       <div 
                         key={sub.id} 
-                        className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white transition-all duration-150 shadow-xs"
+                        className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 transition-all duration-150 shadow-xs"
                       >
                         <label className="flex items-center gap-2.5 cursor-pointer min-w-0 flex-1">
                           <input 
                             type="checkbox" 
                             checked={sub.completed}
                             onChange={() => handleToggleSubtask(sub.id)}
-                            className="w-4 h-4 rounded text-slate-900 border border-slate-200 focus:ring-indigo-500 outline-none"
+                            className="w-4 h-4 rounded text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 focus:ring-indigo-500 outline-none"
                           />
-                          <span className={`text-xs text-slate-700 truncate font-semibold font-mono ${sub.completed ? "line-through text-slate-400 decoration-slate-400" : ""}`}>
+                          <span className={`text-xs text-slate-700 dark:text-slate-300 truncate font-semibold font-mono ${sub.completed ? "line-through text-slate-400 dark:text-slate-600 decoration-slate-400 dark:decoration-slate-600" : ""}`}>
                             {sub.title}
                           </span>
                         </label>
                         <button 
                           type="button" 
                           onClick={() => handleDeleteSubtask(sub.id, sub.title)}
-                          className="p-1 px-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-100 bg-white transition-all cursor-pointer"
+                          className="p-1 px-1.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#1e293b] transition-all cursor-pointer"
                           title="Prune task"
                         >
                           <Trash className="w-3.5 h-3.5" />
@@ -472,12 +472,12 @@ export default function ItemModal({
                         handleAddSubtask();
                       }
                     }}
-                    className="flex-1 bg-white border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-450 focus:border-indigo-400 font-semibold placeholder-slate-400 text-slate-700 transition-all"
+                    className="flex-1 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 font-semibold placeholder-slate-400 dark:placeholder-slate-600 text-slate-700 dark:text-slate-300 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => handleAddSubtask()}
-                    className="px-4 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded-xl border border-slate-250 transition-all font-mono font-bold text-xs uppercase flex items-center gap-1 shrink-0 cursor-pointer"
+                    className="px-4 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white text-slate-700 dark:text-slate-300 rounded-xl border border-slate-250 dark:border-slate-700 transition-all font-mono font-bold text-xs uppercase flex items-center gap-1 shrink-0 cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     Add
@@ -492,7 +492,7 @@ export default function ItemModal({
               
               {/* Item Type Picker */}
               <div className="space-y-1.5 font-sans">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">FLOW ENTRY TYPE</span>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">FLOW ENTRY TYPE</span>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { type: ItemType.TASK, label: "Task", icon: <CheckSquare className="w-3.5 h-3.5" /> },
@@ -508,8 +508,8 @@ export default function ItemModal({
                         onClick={() => setType(entry.type)}
                         className={`flex items-center gap-1.5 p-2.5 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider transition-all ${
                           active 
-                            ? "bg-slate-900 text-white border-slate-900 shadow-xs" 
-                            : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 cursor-pointer"
+                            ? "bg-slate-900 dark:bg-indigo-600 text-white border-slate-900 dark:border-indigo-600 shadow-xs" 
+                            : "bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                         }`}
                       >
                         {entry.icon}
@@ -522,13 +522,13 @@ export default function ItemModal({
 
               {/* Priority level options */}
               <div className="space-y-1.5 font-sans">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">CRITICAL PRIORITY LEVEL</span>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">CRITICAL PRIORITY LEVEL</span>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { priority: Priority.URGENT, label: "Urgent", color: "bg-rose-50 text-rose-700 border-rose-100" },
-                    { priority: Priority.HIGH, label: "High", color: "bg-amber-50 text-amber-700 border-amber-100" },
-                    { priority: Priority.MEDIUM, label: "Medium", color: "bg-indigo-50 text-indigo-700 border-indigo-100" },
-                    { priority: Priority.LOW, label: "Low", color: "bg-slate-50 text-slate-650 border-slate-200 text-slate-700" },
+                    { priority: Priority.URGENT, label: "Urgent", color: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-900/50" },
+                    { priority: Priority.HIGH, label: "High", color: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/50" },
+                    { priority: Priority.MEDIUM, label: "Medium", color: "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50" },
+                    { priority: Priority.LOW, label: "Low", color: "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-700" },
                   ].map((level) => {
                     const active = priority === level.priority;
                     return (
@@ -538,8 +538,8 @@ export default function ItemModal({
                         onClick={() => setPriority(level.priority)}
                         className={`p-2.5 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider text-center transition-all ${
                           active 
-                            ? `${level.color} shadow-xs` 
-                            : "bg-white text-slate-400 border-slate-200 hover:bg-slate-50 cursor-pointer"
+                            ? `${level.color} shadow-xs font-black` 
+                            : "bg-white dark:bg-[#1e293b] text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                         }`}
                       >
                         {level.label}
@@ -551,9 +551,9 @@ export default function ItemModal({
 
               {/* Custom Tags Checklist */}
               <div className="space-y-2 font-sans">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block">TICKET TAGS</span>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono block">TICKET TAGS</span>
                 
-                <div className="flex flex-wrap gap-1.5 p-3 rounded-xl border border-slate-100 bg-slate-50/50 max-h-[140px] overflow-y-auto">
+                <div className="flex flex-wrap gap-1.5 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 max-h-[140px] overflow-y-auto">
                   {tags.map((tg) => {
                     const checked = selectedTags.includes(tg.id);
                     return (
@@ -563,8 +563,8 @@ export default function ItemModal({
                         onClick={() => handleToggleTag(tg.id)}
                         className={`px-2.5 py-1 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition-all ${
                           checked 
-                            ? `${tg.bgClass} border-slate-350 shadow-xs font-black` 
-                            : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 cursor-pointer"
+                            ? `${tg.bgClass} border-slate-350 dark:border-slate-700 shadow-xs font-black` 
+                            : "bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                         }`}
                       >
                         {tg.name}
@@ -572,7 +572,7 @@ export default function ItemModal({
                     );
                   })}
                   {tags.length === 0 && (
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wide font-mono italic">No custom tags created</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wide font-mono italic">No custom tags created</span>
                   )}
                 </div>
               </div>
@@ -582,14 +582,14 @@ export default function ItemModal({
           </div>
 
           {/* Comment Stream Log Panel */}
-          <div className="border-t border-slate-100 pt-6 space-y-4 font-sans">
-            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono flex items-center gap-1.5">
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-4 font-sans">
+            <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1.5">
               <Activity className="w-4 h-4 text-slate-500" />
               Activity Stream & Discussion Log
             </h4>
 
             {/* Comment adding box */}
-            <div className="flex gap-2.5 items-start bg-slate-50/50 p-3.5 rounded-xl border border-slate-100 shadow-xs">
+            <div className="flex gap-2.5 items-start bg-slate-50/50 dark:bg-slate-900/40 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-xs">
               <div className="w-7 h-7 bg-indigo-600 text-white font-mono font-bold rounded-lg text-[10px] flex items-center justify-center shrink-0 animate-pulse">
                 {currentUser.split(" ").map(w => w[0]).join("")}
               </div>
@@ -600,13 +600,13 @@ export default function ItemModal({
                   placeholder="Insert review notes, error updates, or developer guidelines here..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className="w-full text-xs text-slate-700 bg-white border border-slate-200 rounded-lg p-2.5 outline-none focus:border-indigo-400 resize-none font-medium placeholder-slate-400 transition-all font-sans"
+                  className="w-full text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 resize-none font-medium placeholder-slate-400 dark:placeholder-slate-600 transition-all font-sans"
                 />
                 <div className="flex justify-end font-sans">
                   <button
                     type="button"
                     onClick={handleAddComment}
-                    className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                    className="px-3.5 py-1.5 bg-slate-800 dark:bg-indigo-600 hover:bg-slate-900 dark:hover:bg-indigo-700 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     Submit Comment
@@ -620,19 +620,19 @@ export default function ItemModal({
               {history.map((log) => (
                 <div 
                   key={log.id} 
-                  className="p-3 border border-slate-100 rounded-xl bg-slate-50/20 text-xs flex items-start gap-2.5 font-mono shadow-xs"
+                  className="p-3 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-900/40 text-xs flex items-start gap-2.5 font-mono shadow-xs"
                 >
-                  <div className="p-1 px-1.5 bg-white border border-slate-200 rounded text-[9px] font-bold text-slate-500 font-mono shrink-0">
+                  <div className="p-1 px-1.5 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 rounded text-[9px] font-bold text-slate-500 dark:text-slate-400 font-mono shrink-0">
                     {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className="font-bold text-slate-800 mr-1.5 uppercase">{log.user}</span>
-                    <span className="text-slate-600 font-sans leading-relaxed break-words font-medium">{log.action}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-100 mr-1.5 uppercase">{log.user}</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-sans leading-relaxed break-words font-medium">{log.action}</span>
                   </div>
                 </div>
               ))}
               {history.length === 0 && (
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wide font-mono italic text-center p-4">No logged history actions found for this ticket yet.</p>
+                <p className="text-xs text-slate-400 dark:text-slate-600 font-bold uppercase tracking-wide font-mono italic text-center p-4">No logged history actions found for this ticket yet.</p>
               )}
             </div>
 
@@ -641,7 +641,7 @@ export default function ItemModal({
         </form>
 
         {/* Footer actions */}
-        <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             {item && onDelete && (
               <button
@@ -652,7 +652,7 @@ export default function ItemModal({
                     onDelete(item.id);
                   }
                 }}
-                className="px-4 py-2 text-rose-600 hover:text-white hover:bg-rose-500 border border-slate-200 rounded-xl bg-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                className="px-4 py-2 text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-500 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-[#151b2b] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
                 <Trash className="w-4 h-4" />
                 Delete Ticket
@@ -665,7 +665,7 @@ export default function ItemModal({
               id="btn-cancel"
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+              className="px-4 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
             >
               Cancel
             </button>

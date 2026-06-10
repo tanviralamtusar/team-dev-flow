@@ -9,38 +9,62 @@
   --shadow-geom: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
   --shadow-geom-lg: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.03);
   --shadow-geom-sm: 0 1px 2px rgba(0,0,0,0.05);
+
+  --color-geom-bg: #fcfcfc;
+  --color-geom-card: #ffffff;
+  --color-geom-border: #e2e8f0;
+  --color-geom-border-soft: #f1f5f9;
+  --color-geom-text: #0f172a;
+  --color-geom-text-muted: #64748b;
+  --color-geom-btn-hover: #f8fafc;
+}
+
+.dark {
+  --color-geom-bg: #0b0f1a;
+  --color-geom-card: #151b2b;
+  --color-geom-border: #262f45;
+  --color-geom-border-soft: #1e293b;
+  --color-geom-text: #f1f5f9;
+  --color-geom-text-muted: #94a3b8;
+  --color-geom-btn-hover: #1e293b;
+
+  --shadow-geom: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-geom-lg: 0 10px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.3);
 }
 
 /* Minimalist Workspace Styling */
 .geom-grid-pattern {
-  background-color: #fcfcfc;
-  background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+  background-color: var(--color-geom-bg);
+  background-image: radial-gradient(var(--color-geom-border) 1.2px, transparent 1.2px);
   background-size: 20px 20px;
 }
 
 .geom-card-style {
-  border: 1px solid #e2e8f0;
+  background-color: var(--color-geom-card);
+  border: 1px solid var(--color-geom-border);
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  box-shadow: var(--shadow-geom);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--color-geom-text);
 }
 
 .geom-card-style:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.05);
-  border-color: #cbd5e1;
+  box-shadow: var(--shadow-geom-lg);
+  border-color: var(--color-geom-border);
 }
 
 .geom-btn-style {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-geom-border);
   border-radius: 12px;
-  background-color: #ffffff;
+  background-color: var(--color-geom-card);
+  color: var(--color-geom-text);
   transition: all 0.15s ease;
 }
 
 .geom-btn-style:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background-color: var(--color-geom-btn-hover);
+  border-color: var(--color-geom-border);
 }
 
 .geom-btn-style:active {
@@ -48,11 +72,11 @@
 }
 
 .geom-border-dark {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-geom-border);
 }
 
 .geom-border-soft {
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--color-geom-border-soft);
 }
 
 /* Scrollbar customizations */
@@ -64,9 +88,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
+  background: var(--color-geom-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
+  background: var(--color-geom-text-muted);
 }
