@@ -1,0 +1,54 @@
+{
+  "schemas": [
+    {
+      "collection": "items",
+      "description": "Unified Kanban Tickets containing tasks, bugs, errors, and features",
+      "fields": {
+        "id": { "type": "string", "isRequired": true },
+        "title": { "type": "string", "isRequired": true },
+        "description": { "type": "string", "isRequired": false },
+        "type": { "type": "string", "isRequired": true },
+        "priority": { "type": "string", "isRequired": true },
+        "status": { "type": "string", "isRequired": true },
+        "assigneeId": { "type": "string", "isRequired": false },
+        "storyPoints": { "type": "number", "isRequired": false },
+        "dueDate": { "type": "string", "isRequired": false },
+        "tags": { "type": "array<string>", "isRequired": true },
+        "subtasks": { "type": "array<map>", "isRequired": true },
+        "history": { "type": "array<map>", "isRequired": true },
+        "createdDate": { "type": "string", "isRequired": true },
+        "images": { "type": "array<string>", "isRequired": false }
+      }
+    },
+    {
+      "collection": "tags",
+      "description": "Customizable categorization tags",
+      "fields": {
+        "id": { "type": "string", "isRequired": true },
+        "name": { "type": "string", "isRequired": true },
+        "bgClass": { "type": "string", "isRequired": true },
+        "textClass": { "type": "string", "isRequired": true }
+      }
+    },
+    {
+      "collection": "assignees",
+      "description": "Teammates and development engineers",
+      "fields": {
+        "id": { "type": "string", "isRequired": true },
+        "name": { "type": "string", "isRequired": true },
+        "role": { "type": "string", "isRequired": true },
+        "avatarColor": { "type": "string", "isRequired": true }
+      }
+    },
+    {
+      "collection": "columns",
+      "description": "Active development flow stages",
+      "fields": {
+        "id": { "type": "string", "isRequired": true },
+        "title": { "type": "string", "isRequired": true },
+        "textClass": { "type": "string", "isRequired": true },
+        "order": { "type": "number", "isRequired": true }
+      }
+    }
+  ]
+}

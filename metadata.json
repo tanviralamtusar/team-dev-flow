@@ -1,0 +1,6 @@
+{
+  "name": "Dev Kanban Board",
+  "description": "A unified dev-board to manage tasks, bugs, errors, and custom tags for teams.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
