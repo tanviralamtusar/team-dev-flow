@@ -15,6 +15,8 @@ RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS runtime
+# Install build dependencies for better-sqlite3 (needed even for --production)
+RUN apk add --no-cache python3 make g++
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
 
