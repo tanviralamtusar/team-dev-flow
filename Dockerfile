@@ -1,5 +1,7 @@
 # Build stage
 FROM node:20-alpine AS build
+# Install build dependencies for better-sqlite3
+RUN apk add --no-cache python3 make g++
 WORKDIR /usr/src/app
 COPY package.json package-lock.json tsconfig.json vite.config.ts ./
 COPY public ./public
