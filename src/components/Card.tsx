@@ -254,12 +254,12 @@ export default function Card({ item, tags, assignee, onEditItem, onMoveItem, col
       </div>
 
       {/* Manual column shifter trigger for accessibility or mobile touch view */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 flex items-center gap-1">
+      <div className="absolute top-2 right-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity focus-within:opacity-100 flex items-center gap-1">
         <select
           title="Move column"
           value={item.status}
           onChange={(e) => onMoveItem(item.id, e.target.value)}
-          className="text-[9px] bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5 text-slate-500 dark:text-slate-400 focus:border-indigo-400 max-w-[80px] font-mono font-bold outline-none cursor-pointer"
+          className="text-[9px] bg-white/90 dark:bg-[#1e293b]/90 border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5 text-slate-500 dark:text-slate-400 focus:border-indigo-400 max-w-[80px] font-mono font-bold outline-none cursor-pointer shadow-sm"
         >
           {columnsList.map(col => (
             <option key={col.id} value={col.id}>{col.title}</option>
@@ -268,7 +268,7 @@ export default function Card({ item, tags, assignee, onEditItem, onMoveItem, col
         <button 
           id={`btn-edit-${item.id}`}
           onClick={() => onEditItem(item.id)}
-          className="p-1 bg-white dark:bg-[#1e293b] text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
+          className="p-1 bg-white/90 dark:bg-[#1e293b]/90 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-sm"
           title="Edit issue Details"
         >
           <ChevronRight className="w-3.5 h-3.5" />

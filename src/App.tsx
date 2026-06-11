@@ -404,18 +404,18 @@ export default function App() {
       
       {/* Upper Unified Premium Header - Minimalist styling with responsive micro items */}
       <header className="bg-slate-900 dark:bg-[#080c14] text-white border-b border-slate-800/10 dark:border-slate-800/50 shadow-xs backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-auto py-3 md:h-16">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
-              <Terminal className="w-5 h-5 animate-pulse" />
+            <div className="w-8 h-8 md:w-9 md:h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
+              <Terminal className="w-4 h-4 md:w-5 md:h-5 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-display font-medium text-sm tracking-wider text-white">DEVFLOW</span>
+                <span className="font-display font-medium text-xs md:text-sm tracking-wider text-white">DEVFLOW</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="System Status: Connected Live Sync" />
               </div>
-              <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">
-                {isServerOnline ? "SQLITE REST API — LIVE" : "OFFLINE CACHE MODE"}
+              <p className="text-[9px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider">
+                {isServerOnline ? "SQLITE — LIVE" : "OFFLINE"}
               </p>
             </div>
           </div>
@@ -437,15 +437,15 @@ export default function App() {
           </div>
 
           {/* Connected User Badge */}
-          <div className="flex items-center gap-4 font-sans">
+          <div className="flex items-center gap-2 md:gap-4 font-sans">
             <button
               onClick={toggleDarkMode}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer"
+              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer"
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2 md:gap-2.5">
               <div className="text-right hidden sm:block">
                 <span className="text-[9px] text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
                 <span className="text-xs font-semibold text-slate-200 block tracking-tight">{user?.username}</span>
@@ -472,55 +472,55 @@ export default function App() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-4 rounded-2xl shadow-xs">
           
           {/* Active Navigation Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100/60 dark:bg-slate-800/40 p-1 rounded-xl w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-slate-100/60 dark:bg-slate-800/40 p-1 rounded-xl w-full sm:w-auto overflow-x-auto no-scrollbar">
             <button
               id="tab-board"
               onClick={() => setActiveTab("board")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "board" 
                   ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
-              Kanban Board
+              <Layers className="w-3 md:w-3.5 h-3 md:h-3.5" />
+              Board
             </button>
             <button
               id="tab-stats"
               onClick={() => setActiveTab("stats")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "stats" 
                   ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
               }`}
             >
-              <TrendingUp className="w-3.5 h-3.5" />
-              Telemetry Stats
+              <TrendingUp className="w-3 md:w-3.5 h-3 md:h-3.5" />
+              Stats
             </button>
             <button
               id="tab-settings"
               onClick={() => setActiveTab("settings")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "settings" 
                   ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
               }`}
             >
-              <Settings className="w-3.5 h-3.5" />
-              Workspace Setup
+              <Settings className="w-3 md:w-3.5 h-3 md:h-3.5" />
+              Setup
             </button>
           </div>
 
           {/* Quick Addition & Alerts Options */}
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {/* Auto Ingest Error Dropdown */}
-            <div className="relative group shrink-0">
+            <div className="relative group flex-1 sm:flex-initial">
               <button
                 id="btn-trigger-exception"
-                className="px-3.5 py-2.5 bg-white dark:bg-[#1e293b] hover:bg-slate-50/60 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                className="w-full px-3 py-2.5 bg-white dark:bg-[#1e293b] hover:bg-slate-50/60 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-[10px] md:text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
-                <Zap className="w-3.5 h-3.5 text-indigo-505" />
-                Trigger Crash Hook
+                <Zap className="w-3 md:w-3.5 h-3 md:h-3.5 text-indigo-505" />
+                <span className="whitespace-nowrap">Crash Hook</span>
               </button>
               
               {/* Dropdown Options List */}
@@ -557,10 +557,10 @@ export default function App() {
                 setDefaultColumnForNewItem("backlog");
                 setIsModalOpen(true);
               }}
-              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm border-0"
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] md:text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm border-0"
             >
-              <Plus className="w-4 h-4" />
-              Add Ticket
+              <Plus className="w-3.5 md:w-4 h-3.5 md:h-4" />
+              <span className="whitespace-nowrap">Add Ticket</span>
             </button>
           </div>
 
@@ -592,9 +592,9 @@ export default function App() {
                   title="Filter type"
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
+                  className="flex-1 sm:flex-initial bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
-                  <option value="">All Issue Types</option>
+                  <option value="">All Types</option>
                   <option value={ItemType.TASK}>Task</option>
                   <option value={ItemType.BUG}>Bug</option>
                   <option value={ItemType.ERROR}>Error</option>
@@ -606,9 +606,9 @@ export default function App() {
                   title="Filter priority"
                   value={selectedPriority}
                   onChange={(e) => setSelectedPriority(e.target.value)}
-                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
+                  className="flex-1 sm:flex-initial bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
-                  <option value="">All Priorities</option>
+                  <option value="">All Priority</option>
                   <option value={Priority.URGENT}>Urgent</option>
                   <option value={Priority.HIGH}>High</option>
                   <option value={Priority.MEDIUM}>Medium</option>
@@ -620,9 +620,9 @@ export default function App() {
                   title="Filter assignee"
                   value={selectedAssignee}
                   onChange={(e) => setSelectedAssignee(e.target.value)}
-                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
+                  className="flex-1 sm:flex-initial bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
-                  <option value="">All Teammates</option>
+                  <option value="">All Devs</option>
                   {assignees.map((as) => (
                     <option key={as.id} value={as.id}>{as.name}</option>
                   ))}
@@ -633,10 +633,10 @@ export default function App() {
                   <button
                     id="btn-clear-filters"
                     onClick={handleClearFilters}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold border border-transparent rounded-xl transition-all cursor-pointer shadow-xs"
+                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] md:text-xs font-semibold border border-transparent rounded-xl transition-all cursor-pointer shadow-xs"
                   >
                     <XCircle className="w-3.5 h-3.5" />
-                    Reset Filters
+                    Reset
                   </button>
                 )}
 

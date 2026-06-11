@@ -236,23 +236,23 @@ export default function ItemModal({
   };
 
   return (
-    <div id="item-modal-overlay" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-xs overflow-y-auto font-sans">
+    <div id="item-modal-overlay" className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-xs overflow-y-auto font-sans">
       <div 
         id="item-modal-container"
-        className="relative w-full max-w-3xl bg-white dark:bg-[#151b2b] rounded-2xl shadow-geom-lg border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col my-8 max-h-[90vh] animate-fade-in"
+        className="relative w-full max-w-3xl bg-white dark:bg-[#151b2b] sm:rounded-2xl shadow-geom-lg border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] animate-in slide-in-from-bottom-4 duration-300"
       >
         {/* Modal Title Banner */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
             <span className="p-2 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-              <Hash className="w-5 h-5" />
+              <Hash className="w-4 h-4 md:w-5 md:h-5" />
             </span>
             <div>
-              <h3 className="text-sm font-display font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
-                {item ? "Inspect Board Ticket" : "Provision New Development Ticket"}
+              <h3 className="text-xs md:text-sm font-display font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                {item ? "Inspect Ticket" : "New Ticket"}
               </h3>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-medium uppercase mt-0.5">
-                {item ? `Ticket Identifier: ${item.id}` : "Configure parameters to expand board coverage"}
+              <p className="text-[9px] md:text-[10px] text-slate-400 dark:text-slate-500 font-mono font-medium uppercase mt-0.5">
+                {item ? `ID: ${item.id}` : "Configure parameters"}
               </p>
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function ItemModal({
         </div>
 
         {/* Form Body - Scrollable */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 md:space-y-6">
           
           {/* Main Title Input */}
           <div className="space-y-1.5">
@@ -641,8 +641,8 @@ export default function ItemModal({
         </form>
 
         {/* Footer actions */}
-        <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
+        <div className="px-4 md:px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex justify-center md:justify-start">
             {item && onDelete && (
               <button
                 id="btn-delete-ticket"
@@ -652,10 +652,10 @@ export default function ItemModal({
                     onDelete(item.id);
                   }
                 }}
-                className="px-4 py-2 text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-500 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-[#151b2b] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                className="w-full md:w-auto px-4 py-2 text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-500 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-[#151b2b] text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
-                <Trash className="w-4 h-4" />
-                Delete Ticket
+                <Trash className="w-3.5 md:w-4 h-3.5 md:h-4" />
+                Delete
               </button>
             )}
           </div>
@@ -665,17 +665,17 @@ export default function ItemModal({
               id="btn-cancel"
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+              className="flex-1 md:flex-none px-4 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               id="btn-save"
               onClick={handleSubmit}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer border-0"
+              className="flex-[2] md:flex-none px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer border-0"
             >
-              <Check className="w-4 h-4" />
-              {item ? "Apply Ticket Changes" : "Commit Ticket to Board"}
+              <Check className="w-3.5 md:w-4 h-3.5 md:h-4" />
+              {item ? "Apply Changes" : "Commit Ticket"}
             </button>
           </div>
         </div>

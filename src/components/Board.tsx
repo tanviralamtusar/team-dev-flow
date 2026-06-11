@@ -88,7 +88,7 @@ export default function Board({
   return (
     <div 
       id="kanban-board-scroller" 
-      className="flex gap-5 overflow-x-auto pb-6 pt-2 select-none scrollbar-thin snap-x snap-mandatory font-sans"
+      className="flex gap-4 md:gap-5 overflow-x-auto pb-6 pt-2 select-none scrollbar-thin snap-x snap-mandatory font-sans px-0.5 md:px-0"
     >
       {columns.map((col) => {
         const columnItems = filteredItems.filter((i) => i.status === col.id);
@@ -103,7 +103,7 @@ export default function Board({
             onDragEnter={(e) => handleDragEnter(e, col.id)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, col.id)}
-            className={`flex-1 min-w-[285px] max-w-[350px] snap-always snap-start shrink-0 flex flex-col rounded-2xl border transition-all duration-200 ${
+            className={`flex-1 min-w-[85vw] sm:min-w-[285px] max-w-[350px] snap-always snap-center sm:snap-start shrink-0 flex flex-col rounded-2xl border transition-all duration-200 ${
               isTarget 
                 ? "bg-indigo-50/40 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800/50 shadow-sm" 
                 : "bg-slate-50/40 dark:bg-slate-900/40 border-slate-100 dark:border-slate-800/50 shadow-xs"
