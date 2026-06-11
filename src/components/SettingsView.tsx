@@ -60,6 +60,7 @@ export default function SettingsView({
   const [newMemberRole, setNewMemberRole] = useState("");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [memberColor, setMemberColor] = useState(AVATAR_COLORS[0]);
+  const [isInviteLoading, setIsInviteLoading] = useState(false);
 
   // Tag Form States
   const [newTagName, setNewTagName] = useState("");
@@ -69,26 +70,40 @@ export default function SettingsView({
   const [newColTitle, setNewColTitle] = useState("");
 
   // Handler: Add Teammate
-  const handleAddMember = (e: React.FormEvent) => {
+  const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberName.trim()) return;
 
-    const newMember: Assignee = {
-      id: `dev-${Date.now()}`,
-      name: newMemberName.trim(),
-      avatarColor: memberColor,
-      role: newMemberRole.trim() || "Developer",
-      email: newMemberEmail.trim() || "dev@company.com",
-    };
+    setIsInviteLoading(true);
+    try {
+      // Logic: 
+      // 1. We want to see if a profile already exists for this email
+      // 2. If it does, we use its ID. If not, we create a pseudo-assignee.
+      const profiles = await api.getAllProfiles();
+      const existingProfile = profiles.find(p => p.email.toLowerCase() === newMemberEmail.trim().toLowerCase());
 
-    onUpdateAssignees([...assignees, newMember]);
-    setNewMemberName("");
-    setNewMemberRole("");
-    setNewMemberEmail("");
-    
-    // Switch to next avatar color automatically
-    const nextIdx = (AVATAR_COLORS.indexOf(memberColor) + 1) % AVATAR_COLORS.length;
-    setMemberColor(AVATAR_COLORS[nextIdx]);
+      const newMember: Assignee = {
+        id: existingProfile ? existingProfile.id : `dev-${Date.now()}`,
+        name: newMemberName.trim(),
+        avatarColor: memberColor,
+        role: newMemberRole.trim() || (existingProfile?.role) || "Developer",
+        email: newMemberEmail.trim() || "dev@company.com",
+      };
+
+      onUpdateAssignees([...assignees, newMember]);
+      setNewMemberName("");
+      setNewMemberRole("");
+      setNewMemberEmail("");
+      
+      // Switch to next avatar color automatically
+      const nextIdx = (AVATAR_COLORS.indexOf(memberColor) + 1) % AVATAR_COLORS.length;
+      setMemberColor(AVATAR_COLORS[nextIdx]);
+    } catch (err) {
+      console.error("Failed to add member:", err);
+      alert("Error linking team member. Check console for details.");
+    } finally {
+      setIsInviteLoading(false);
+    }
   };
 
   // Handler: Delete Teammate
@@ -277,10 +292,15 @@ export default function SettingsView({
 
           <button
             type="submit"
-            className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold uppercase tracking-wider transition-all border-0 flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+            disabled={isInviteLoading}
+            className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-xl text-xs font-semibold uppercase tracking-wider transition-all border-0 flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            Append Member to Roster
+            {isInviteLoading ? (
+               <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Plus className="w-4 h-4" />
+            )}
+            {isInviteLoading ? "Linking Member..." : "Append Member to Roster"}
           </button>
         </form>
       </div>
