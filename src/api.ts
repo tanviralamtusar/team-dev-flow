@@ -30,8 +30,9 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   });
 
   if (res.status === 401 || res.status === 403) {
-    // Optional: Clear token on auth error
-    // setToken(null);
+    setToken(null);
+    // Force a reload to trigger App.tsx's auth check or just let it fail naturally
+    window.location.reload();
   }
 
   if (!res.ok) {

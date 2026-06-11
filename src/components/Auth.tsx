@@ -76,7 +76,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-              Username
+              {isLogin ? "Username or Email" : "Username"}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -87,7 +87,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                 value={formData.username}
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:text-white"
-                placeholder="johndoe"
+                placeholder={isLogin ? "johndoe or john@example.com" : "johndoe"}
               />
             </div>
           </div>

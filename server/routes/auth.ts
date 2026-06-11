@@ -10,14 +10,27 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret_key";
 // POST /api/auth/signup
 router.post("/signup", async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // Basic validation
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters long" });
+    }
+
+    if (!email.includes("@")) {
+      return res.status(400).json({ error: "Invalid email address" });
+    }
+
+    // Normalize
+    username = username.trim();
+    email = email.trim().toLowerCase();
+
     // Check if user already exists
-    const existingUser = db.prepare("SELECT * FROM users WHERE username = ? OR email = ?").get(username, email);
+    const existingUser = db.prepare("SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR email = ?").get(username, email);
     if (existingUser) {
       return res.status(400).json({ error: "Username or email already exists" });
     }
@@ -35,9 +48,9 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     // Create a corresponding profile
     db.prepare(`
-      INSERT INTO profiles (id, displayName, email, createdAt)
-      VALUES (?, ?, ?, ?)
-    `).run(userId, username, email, createdAt);
+      INSERT INTO profiles (id, displayName, email, createdAt, role)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(userId, username, email, createdAt, "developer");
 
     // Generate token
     const token = jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: "24h" });
@@ -55,14 +68,23 @@ router.post("/signup", async (req: Request, res: Response) => {
 // POST /api/auth/login
 router.post("/login", async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body;
+    let { username, password } = req.body; // username can be email or username
 
     if (!username || !password) {
-      return res.status(400).json({ error: "Username and password are required" });
+      return res.status(400).json({ error: "Username/email and password are required" });
     }
 
-    // Find user
-    const user = db.prepare("SELECT * FROM users WHERE username = ?").get(username) as any;
+    const identifier = username.trim();
+    const isEmail = identifier.includes("@");
+
+    // Find user by username or email
+    let user;
+    if (isEmail) {
+      user = db.prepare("SELECT * FROM users WHERE email = ?").get(identifier.toLowerCase()) as any;
+    } else {
+      user = db.prepare("SELECT * FROM users WHERE LOWER(username) = LOWER(?)").get(identifier) as any;
+    }
+
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
