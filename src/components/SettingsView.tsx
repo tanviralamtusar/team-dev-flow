@@ -15,7 +15,10 @@ import {
   Sparkles
 } from "lucide-react";
 
+import * as api from "../api";
+
 interface SettingsViewProps {
+  projectId: string;
   tags: Tag[];
   assignees: Assignee[];
   columns: Column[];
@@ -46,6 +49,7 @@ const AVATAR_COLORS = [
 ];
 
 export default function SettingsView({
+  projectId,
   tags,
   assignees,
   columns,
@@ -61,6 +65,8 @@ export default function SettingsView({
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [memberColor, setMemberColor] = useState(AVATAR_COLORS[0]);
   const [isInviteLoading, setIsInviteLoading] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [isSendingInvitation, setIsSendingInvitation] = useState(false);
 
   // Tag Form States
   const [newTagName, setNewTagName] = useState("");
@@ -110,6 +116,22 @@ export default function SettingsView({
   const handleDeleteMember = (id: string, name: string) => {
     if (confirm(`Are you sure you want to remove ${name} from the team? Board items assigned to them will continue to exist but show as unassigned.`)) {
       onUpdateAssignees(assignees.filter((a) => a.id !== id));
+    }
+  };
+
+  const handleInviteUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim() || !projectId) return;
+
+    setIsSendingInvitation(true);
+    try {
+      await api.sendInvitation(projectId, inviteEmail.trim());
+      alert(`Invitation sent to ${inviteEmail.trim()}!`);
+      setInviteEmail("");
+    } catch (err: any) {
+      alert(err.message || "Failed to send invitation");
+    } finally {
+      setIsSendingInvitation(false);
     }
   };
 
@@ -229,6 +251,33 @@ export default function SettingsView({
             </div>
           ))}
         </div>
+
+        {/* Invitation Form Panel */}
+        <form onSubmit={handleInviteUser} className="bg-amber-50/30 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/30 space-y-3">
+          <span className="text-[10px] font-bold text-amber-600 dark:text-amber-500 font-mono tracking-wider uppercase block flex items-center gap-1.5">
+            <Mail className="w-3.5 h-3.5" />
+            Invite Collaborator
+          </span>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              required
+              placeholder="teammate@company.com"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              className="flex-1 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none focus:border-amber-400 dark:focus:border-amber-500 font-medium text-slate-600 dark:text-slate-300"
+            />
+            <button
+              type="submit"
+              disabled={isSendingInvitation}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+            >
+              {isSendingInvitation ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+              Invite
+            </button>
+          </div>
+          <p className="text-[9px] text-amber-600/70 dark:text-amber-500/50 font-medium">Invited users will see a notification on their dashboard to join this project.</p>
+        </form>
 
         {/* Add Teammate Form Panel */}
         <form onSubmit={handleAddMember} className="bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">

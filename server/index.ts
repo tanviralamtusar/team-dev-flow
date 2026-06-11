@@ -7,6 +7,8 @@ import { seedDatabase } from "./seed.js";
 
 // Route imports
 import authRouter from "./routes/auth.js";
+import projectsRouter from "./routes/projects.js";
+import invitationsRouter from "./routes/invitations.js";
 import itemsRouter from "./routes/items.js";
 import columnsRouter from "./routes/columns.js";
 import tagsRouter from "./routes/tags.js";
@@ -30,6 +32,8 @@ app.use("/uploads", express.static(UPLOADS_DIR));
 
 // ── API Routes ─────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRouter);
+app.use("/api/projects", authenticateToken, projectsRouter);
+app.use("/api/invitations", authenticateToken, invitationsRouter);
 app.use("/api/items", authenticateToken, itemsRouter);
 app.use("/api/columns", authenticateToken, columnsRouter);
 app.use("/api/tags", authenticateToken, tagsRouter);

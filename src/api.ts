@@ -3,11 +3,12 @@
  * Typed REST API client for the SQLite/Express backend.
  * All functions mirror the Firebase operations previously in App.tsx.
  */
-import { BoardItem, Column, Tag, Assignee, Profile } from "./types";
+import { BoardItem, Column, Tag, Assignee, Profile, Project, Invitation } from "./types";
 
 const BASE = "/api";
 
 let authToken: string | null = localStorage.getItem("auth_token");
+let currentProjectId: string | null = localStorage.getItem("current_project_id");
 
 export const setToken = (token: string | null) => {
   authToken = token;
@@ -15,6 +16,16 @@ export const setToken = (token: string | null) => {
     localStorage.setItem("auth_token", token);
   } else {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("current_project_id");
+  }
+};
+
+export const setProjectId = (id: string | null) => {
+  currentProjectId = id;
+  if (id) {
+    localStorage.setItem("current_project_id", id);
+  } else {
+    localStorage.removeItem("current_project_id");
   }
 };
 
@@ -24,14 +35,31 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  const res = await fetch(`${BASE}${url}`, {
+  let finalUrl = `${BASE}${url}`;
+  if (currentProjectId && (url.startsWith("/items") || url.startsWith("/columns") || url.startsWith("/tags") || url.startsWith("/assignees"))) {
+    const separator = finalUrl.includes("?") ? "&" : "?";
+    finalUrl += `${separator}projectId=${currentProjectId}`;
+    
+    if (options.method === "POST" || options.method === "PUT") {
+      try {
+        const body = JSON.parse(options.body as string);
+        options.body = JSON.stringify({ ...body, projectId: currentProjectId });
+      } catch {
+        // Not JSON or no body
+      }
+    }
+  } else if (!currentProjectId && (url.startsWith("/items") || url.startsWith("/columns") || url.startsWith("/tags") || url.startsWith("/assignees"))) {
+    // If no project selected but trying to access project resources, we might want to handle it
+    // For now, let it fail or handle in App.tsx
+  }
+
+  const res = await fetch(finalUrl, {
     ...options,
     headers,
   });
 
   if (res.status === 401 || res.status === 403) {
     setToken(null);
-    // Force a reload to trigger App.tsx's auth check or just let it fail naturally
     window.location.reload();
   }
 
@@ -119,6 +147,24 @@ export const createProfile = (profile: Omit<Profile, "createdAt">) =>
 
 export const updateProfile = (id: string, data: Partial<Profile>) =>
   request<Profile>(`/profiles/${id}`, json("PUT", data));
+
+// ── Projects ──────────────────────────────────────────────────────────────────
+export const getProjects = () => request<Project[]>("/projects");
+
+export const createProject = (name: string) => 
+  request<Project>("/projects", json("POST", { name }));
+
+// ── Invitations ───────────────────────────────────────────────────────────────
+export const getInvitations = () => request<Invitation[]>("/invitations");
+
+export const sendInvitation = (projectId: string, email: string) =>
+  request<Invitation>("/invitations/invite", json("POST", { projectId, email }));
+
+export const acceptInvitation = (id: string) =>
+  request<{ success: boolean }>(`/invitations/${id}/accept`, json("POST", {}));
+
+export const declineInvitation = (id: string) =>
+  request<{ success: boolean }>(`/invitations/${id}/decline`, json("POST", {}));
 
 /**
  * Upload a profile avatar image.

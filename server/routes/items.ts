@@ -1,12 +1,15 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import db from "../db.js";
+import { AuthRequest } from "../middleware/auth.js";
+import { verifyProjectMember } from "../middleware/project.js";
 
 const router = Router();
 
 // GET /api/items
-router.get("/", (_req: Request, res: Response) => {
+router.get("/", verifyProjectMember, (req: AuthRequest, res: Response) => {
   try {
-    const rows = db.prepare("SELECT data FROM items").all() as { data: string }[];
+    const { projectId } = req.query;
+    const rows = db.prepare("SELECT data FROM items WHERE projectId = ?").all(projectId) as { data: string }[];
     const items = rows.map((r) => JSON.parse(r.data));
     // Sort newest first
     items.sort((a: { createdDate?: string }, b: { createdDate?: string }) =>
@@ -19,29 +22,33 @@ router.get("/", (_req: Request, res: Response) => {
 });
 
 // POST /api/items  — create or upsert
-router.post("/", (req: Request, res: Response) => {
+router.post("/", verifyProjectMember, (req: AuthRequest, res: Response) => {
   try {
-    const item = req.body;
+    const { projectId, ...item } = req.body;
     if (!item?.id) return res.status(400).json({ error: "Missing item.id" });
-    db.prepare("INSERT OR REPLACE INTO items (id, data) VALUES (?, ?)").run(
+    if (!projectId) return res.status(400).json({ error: "Missing projectId" });
+
+    db.prepare("INSERT OR REPLACE INTO items (id, projectId, data) VALUES (?, ?, ?)").run(
       item.id,
+      projectId,
       JSON.stringify(item)
     );
     res.status(201).json(item);
   } catch (err) {
+    console.error("Save item error:", err);
     res.status(500).json({ error: "Failed to save item" });
   }
 });
 
 // PUT /api/items/:id — update existing
-router.put("/:id", (req: Request, res: Response) => {
+router.put("/:id", verifyProjectMember, (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const item = req.body;
+    const { projectId, ...item } = req.body;
     const result = db
-      .prepare("UPDATE items SET data = ? WHERE id = ?")
-      .run(JSON.stringify({ ...item, id }), id);
-    if (result.changes === 0) return res.status(404).json({ error: "Item not found" });
+      .prepare("UPDATE items SET data = ? WHERE id = ? AND projectId = ?")
+      .run(JSON.stringify({ ...item, id }), id, projectId);
+    if (result.changes === 0) return res.status(404).json({ error: "Item not found or not in project" });
     res.json({ ...item, id });
   } catch (err) {
     res.status(500).json({ error: "Failed to update item" });
@@ -49,11 +56,12 @@ router.put("/:id", (req: Request, res: Response) => {
 });
 
 // DELETE /api/items/:id
-router.delete("/:id", (req: Request, res: Response) => {
+router.delete("/:id", verifyProjectMember, (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const result = db.prepare("DELETE FROM items WHERE id = ?").run(id);
-    if (result.changes === 0) return res.status(404).json({ error: "Item not found" });
+    const { projectId } = req.query;
+    const result = db.prepare("DELETE FROM items WHERE id = ? AND projectId = ?").run(id, projectId);
+    if (result.changes === 0) return res.status(404).json({ error: "Item not found or not in project" });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete item" });

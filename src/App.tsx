@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { BoardItem, Column, Tag, Assignee, ItemType, Priority, ActivityLog } from "./types";
+import { BoardItem, Column, Tag, Assignee, ItemType, Priority, ActivityLog, Project, Invitation } from "./types";
 import { 
   INITIAL_COLUMNS, 
   INITIAL_TAGS, 
@@ -37,7 +37,12 @@ import {
   Sun,
   LogOut,
   User as UserIcon,
-  Loader2
+  Loader2,
+  FolderKanban,
+  Bell,
+  ChevronDown,
+  Check,
+  X
 } from "lucide-react";
 
 // REST API client (SQLite backend)
@@ -48,13 +53,20 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
+  // --- Project & Team States ---
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [isProjectsDropdownOpen, setIsProjectsDropdownOpen] = useState(false);
+  const [isInvitationsOpen, setIsInvitationsOpen] = useState(false);
+
   // --- Persistent Workspace States ---
   const [items, setItems] = useState<BoardItem[]>([]);
   const [columns, setColumns] = useState<Column[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [assignees, setAssignees] = useState<Assignee[]>([]);
 
-  // --- Auth Check ---
+  // --- Auth & Project Check ---
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("auth_token");
@@ -65,6 +77,25 @@ export default function App() {
       try {
         const u = await api.getCurrentUser();
         setUser(u);
+        
+        // Fetch projects
+        const fetchedProjects = await api.getProjects();
+        setProjects(fetchedProjects);
+        
+        // Restore active project or set first one
+        const savedProjectId = localStorage.getItem("current_project_id");
+        const restored = fetchedProjects.find(p => p.id === savedProjectId);
+        if (restored) {
+          setActiveProject(restored);
+          api.setProjectId(restored.id);
+        } else if (fetchedProjects.length > 0) {
+          setActiveProject(fetchedProjects[0]);
+          api.setProjectId(fetchedProjects[0].id);
+        }
+
+        // Fetch invitations
+        const fetchedInvs = await api.getInvitations();
+        setInvitations(fetchedInvs);
       } catch {
         api.setToken(null);
         setUser(null);
@@ -77,7 +108,61 @@ export default function App() {
 
   const handleLogout = () => {
     api.setToken(null);
+    api.setProjectId(null);
     setUser(null);
+    setActiveProject(null);
+    setProjects([]);
+  };
+
+  const handleSwitchProject = (project: Project) => {
+    setActiveProject(project);
+    api.setProjectId(project.id);
+    setIsProjectsDropdownOpen(false);
+    // Trigger data reload
+    fetchAllData();
+  };
+
+  const handleCreateProject = async () => {
+    const name = prompt("Enter project name:");
+    if (!name) return;
+    try {
+      const newProj = await api.createProject(name);
+      setProjects(prev => [...prev, newProj]);
+      handleSwitchProject(newProj);
+      
+      // Seed the new project with initial data
+      await Promise.all([
+        ...INITIAL_COLUMNS.map(c => api.saveColumn(c)),
+        ...INITIAL_TAGS.map(t => api.saveTag(t)),
+        ...INITIAL_ASSIGNEES.map(a => api.saveAssignee(a)),
+      ]);
+      fetchAllData();
+    } catch (err) {
+      alert("Failed to create project");
+    }
+  };
+
+  const handleAcceptInvitation = async (inv: Invitation) => {
+    try {
+      await api.acceptInvitation(inv.id);
+      setInvitations(prev => prev.filter(i => i.id !== inv.id));
+      const fetchedProjects = await api.getProjects();
+      setProjects(fetchedProjects);
+      if (!activeProject && fetchedProjects.length > 0) {
+        handleSwitchProject(fetchedProjects[0]);
+      }
+    } catch (err) {
+      alert("Failed to accept invitation");
+    }
+  };
+
+  const handleDeclineInvitation = async (inv: Invitation) => {
+    try {
+      await api.declineInvitation(inv.id);
+      setInvitations(prev => prev.filter(i => i.id !== inv.id));
+    } catch (err) {
+      alert("Failed to decline invitation");
+    }
   };
 
   // --- Theme Management ---
@@ -121,7 +206,7 @@ export default function App() {
 
   // --- Load all data from the REST API ---
   const fetchAllData = useCallback(async () => {
-    if (!user) return;
+    if (!user || !activeProject) return;
     try {
       const healthy = await api.checkHealth();
       if (!healthy) throw new Error("Server offline");
@@ -167,11 +252,11 @@ export default function App() {
 
   // Initial load + 15-second polling for live sync across tabs
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeProject) return;
     fetchAllData();
     pollRef.current = setInterval(fetchAllData, 15000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, [fetchAllData, user]);
+  }, [fetchAllData, user, activeProject]);
 
   // --- Ticket Operations ---
   
@@ -399,6 +484,51 @@ export default function App() {
     return <Auth onAuthenticated={(u) => setUser(u)} />;
   }
 
+  if (projects.length === 0 && !isAuthChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0b0f1a] p-4 text-center">
+        <div className="max-w-md w-full bg-white dark:bg-[#151b2b] p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+          <FolderKanban className="w-16 h-16 text-indigo-500 mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">No Projects Found</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8">You haven't been added to any projects yet. Create your first workspace to start organizing your tasks.</p>
+          <button
+            onClick={handleCreateProject}
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20"
+          >
+            Create First Project
+          </button>
+          
+          {invitations.length > 0 && (
+            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center justify-center gap-2">
+                <Bell className="w-4 h-4 text-amber-500" />
+                Pending Invitations ({invitations.length})
+              </h3>
+              <div className="space-y-3">
+                {invitations.map(inv => (
+                  <div key={inv.id} className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between text-left">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{inv.projectName}</p>
+                      <p className="text-[10px] text-slate-500">From {inv.inviterName}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <button onClick={() => handleAcceptInvitation(inv)} className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-200 transition-colors">
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDeclineInvitation(inv)} className="p-1.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-200 transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div id="devflow-root" className="min-h-screen bg-slate-50/50 dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
       
@@ -409,14 +539,52 @@ export default function App() {
             <div className="w-8 h-8 md:w-9 md:h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
               <Terminal className="w-4 h-4 md:w-5 md:h-5 animate-pulse" />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-display font-medium text-xs md:text-sm tracking-wider text-white">DEVFLOW</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="System Status: Connected Live Sync" />
-              </div>
-              <p className="text-[9px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider">
-                {isServerOnline ? "SQLITE — LIVE" : "OFFLINE"}
-              </p>
+            <div className="relative group">
+              <button 
+                onClick={() => setIsProjectsDropdownOpen(!isProjectsDropdownOpen)}
+                className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-all text-left"
+              >
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-display font-medium text-xs md:text-sm tracking-wider text-white uppercase">{activeProject?.name || "No Project"}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </div>
+                  <p className="text-[9px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider">
+                    {isServerOnline ? "SQLITE — LIVE" : "OFFLINE"}
+                  </p>
+                </div>
+              </button>
+              
+              {isProjectsDropdownOpen && (
+                <div className="absolute left-0 top-full mt-2 w-64 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 p-2 animate-in fade-in slide-in-from-top-1">
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono px-3 py-2 uppercase tracking-widest border-b border-slate-50 dark:border-slate-800/50 mb-1">Your Workspaces</p>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {projects.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => handleSwitchProject(p)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all mb-1 ${
+                          activeProject?.id === p.id 
+                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold" 
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        <span className="truncate">{p.name}</span>
+                        {activeProject?.id === p.id && <Check className="w-4 h-4 shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50 mt-1">
+                    <button
+                      onClick={handleCreateProject}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all font-semibold"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Create New Project
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -438,6 +606,58 @@ export default function App() {
 
           {/* Connected User Badge */}
           <div className="flex items-center gap-2 md:gap-4 font-sans">
+            {/* Invitations Notification */}
+            <div className="relative">
+              <button
+                onClick={() => setIsInvitationsOpen(!isInvitationsOpen)}
+                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer relative ${isInvitationsOpen ? "text-white bg-slate-700/50" : ""}`}
+                title="Invitations"
+              >
+                <Bell className="w-4 h-4 md:w-5 md:h-5" />
+                {invitations.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-slate-900 animate-bounce">
+                    {invitations.length}
+                  </span>
+                )}
+              </button>
+
+              {isInvitationsOpen && (
+                <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 p-3 animate-in fade-in slide-in-from-top-1">
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono px-2 py-1 uppercase tracking-widest border-b border-slate-50 dark:border-slate-800/50 mb-3">Project Invitations</p>
+                  
+                  {invitations.length === 0 ? (
+                    <div className="text-center py-6">
+                      <Inbox className="w-8 h-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">No pending invitations</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {invitations.map(inv => (
+                        <div key={inv.id} className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white mb-1">{inv.projectName}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-3">Invited by <span className="text-indigo-500 font-semibold">{inv.inviterName}</span></p>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleAcceptInvitation(inv)}
+                              className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded-lg transition-all"
+                            >
+                              Accept
+                            </button>
+                            <button 
+                              onClick={() => handleDeclineInvitation(inv)}
+                              className="flex-1 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-lg transition-all"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <button
               onClick={toggleDarkMode}
               className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer"
@@ -717,6 +937,7 @@ export default function App() {
 
           {activeTab === "settings" && (
             <SettingsView
+              projectId={activeProject?.id || ""}
               tags={tags}
               assignees={assignees}
               columns={columns}

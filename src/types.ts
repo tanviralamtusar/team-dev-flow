@@ -74,3 +74,21 @@ export interface Profile {
   role?: string;
   createdAt: string;
 }
+
+export interface Project {
+  id: string;
+  name: string;
+  ownerId: string;
+  createdAt: string;
+}
+
+export interface Invitation {
+  id: string;
+  projectId: string;
+  projectName: string;
+  inviterId: string;
+  inviterName: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'declined';
+  createdAt: string;
+}

@@ -24,9 +24,9 @@ function seedTable(table: string, items: Array<{ id: string; [key: string]: unkn
 
 export function seedDatabase() {
   console.log("🌱 Seeding database...");
-  seedTable("columns", INITIAL_COLUMNS);
-  seedTable("tags", INITIAL_TAGS);
-  seedTable("assignees", INITIAL_ASSIGNEES);
-  seedTable("items", INITIAL_ITEMS);
+  seedTable("columns", INITIAL_COLUMNS as any);
+  seedTable("tags", INITIAL_TAGS as any);
+  seedTable("assignees", INITIAL_ASSIGNEES as any);
+  seedTable("items", INITIAL_ITEMS as any);
   console.log("✅ Seeding complete\n");
 }
