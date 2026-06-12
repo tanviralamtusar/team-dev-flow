@@ -199,17 +199,35 @@ export default function App() {
   });
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("dev_board_theme")) {
+        setIsDarkMode(e.matches);
+      }
+    };
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  // Update theme on manual change
+  useEffect(() => {
     const root = window.document.documentElement;
     if (isDarkMode) {
       root.classList.add("dark");
-      localStorage.setItem("dev_board_theme", "dark");
+      root.style.colorScheme = "dark";
     } else {
       root.classList.remove("dark");
-      localStorage.setItem("dev_board_theme", "light");
+      root.style.colorScheme = "light";
     }
   }, [isDarkMode]);
 
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => {
+      const newVal = !prev;
+      localStorage.setItem("dev_board_theme", newVal ? "dark" : "light");
+      return newVal;
+    });
+  };
 
   // API / server connectivity
   const [isServerOnline, setIsServerOnline] = useState(true);
@@ -510,7 +528,7 @@ export default function App() {
 
   if (isAuthChecking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0b0f1a]">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0b0f1a]">
         <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
       </div>
     );
@@ -521,10 +539,10 @@ export default function App() {
   }
 
   return (
-    <div id="devflow-root" className="min-h-screen bg-slate-50/50 dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
+    <div id="devflow-root" className="min-h-screen bg-white dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
       
       {/* Upper Unified Premium Header - Minimalist styling with responsive micro items */}
-      <header className="bg-slate-900 dark:bg-[#080c14] text-white border-b border-slate-800/10 dark:border-slate-800/50 shadow-xs backdrop-blur-md">
+      <header className="bg-white dark:bg-[#080c14] text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800/50 shadow-xs backdrop-blur-md">
         <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-auto py-3 md:h-16">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 md:w-9 md:h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
@@ -537,7 +555,7 @@ export default function App() {
               >
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-display font-medium text-xs md:text-sm tracking-wider text-white uppercase">{activeProject?.name || "No Project"}</span>
+                      <span className="font-display font-medium text-xs md:text-sm tracking-wider text-slate-900 dark:text-white uppercase">{activeProject?.name || "No Project"}</span>
                       {activeProject && (
                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-800/50 border border-slate-700 text-[10px] text-slate-300 ml-1">
                           <Users className="w-3 h-3" />
@@ -595,17 +613,17 @@ export default function App() {
 
           {/* Quick Stats Summary Pills */}
           <div className="hidden md:flex items-center gap-2 text-[11px] font-mono text-slate-300">
-            <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-800/40">
-              <span className="text-slate-400 font-bold uppercase tracking-widest">TICKETS:</span>
-              <span className="font-bold text-white text-xs">{items.length}</span>
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800/40">
+              <span className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">TICKETS:</span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs">{items.length}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-800/40">
-              <span className="text-rose-450 text-rose-300 font-bold uppercase tracking-widest">BUGS:</span>
-              <span className="font-bold text-rose-300 text-xs">{items.filter(i => i.type === ItemType.BUG).length}</span>
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800/40">
+              <span className="text-rose-600 dark:text-rose-300 font-bold uppercase tracking-widest">BUGS:</span>
+              <span className="font-bold text-rose-600 dark:text-rose-300 text-xs">{items.filter(i => i.type === ItemType.BUG).length}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-800/40">
-              <span className="text-red-450 text-red-300 font-bold uppercase tracking-widest">CRASHES:</span>
-              <span className="font-bold text-red-300 text-xs">{items.filter(i => i.type === ItemType.ERROR).length}</span>
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800/40">
+              <span className="text-red-600 dark:text-red-300 font-bold uppercase tracking-widest">CRASHES:</span>
+              <span className="font-bold text-red-600 dark:text-red-300 text-xs">{items.filter(i => i.type === ItemType.ERROR).length}</span>
             </div>
           </div>
 
@@ -615,7 +633,7 @@ export default function App() {
             <div className="relative">
               <button
                 onClick={() => setIsInvitationsOpen(!isInvitationsOpen)}
-                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer relative ${isInvitationsOpen ? "text-white bg-slate-700/50" : ""}`}
+                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-all cursor-pointer relative ${isInvitationsOpen ? "text-indigo-600 dark:text-white bg-slate-200 dark:bg-slate-700/50" : ""}`}
                 title="Invitations"
               >
                 <Bell className="w-4 h-4 md:w-5 md:h-5" />
@@ -665,22 +683,22 @@ export default function App() {
 
             <button
               onClick={toggleDarkMode}
-              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all cursor-pointer"
+              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-all cursor-pointer"
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
             <div className="flex items-center gap-2 md:gap-2.5">
               <div className="text-right hidden sm:block">
-                <span className="text-[9px] text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
-                <span className="text-xs font-semibold text-slate-200 block tracking-tight">{user?.username}</span>
+                <span className="text-[9px] text-indigo-400 dark:text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
+                <span className="text-xs font-semibold text-white dark:text-slate-200 block tracking-tight">{user?.username}</span>
               </div>
               <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm">
                 {user?.username?.substring(0, 2).toUpperCase()}
               </div>
               <button
                 onClick={handleLogout}
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-red-400 hover:bg-red-900/20 transition-all cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all cursor-pointer"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
