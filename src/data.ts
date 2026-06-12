@@ -19,9 +19,6 @@ export const INITIAL_TAGS: Tag[] = [
 
 export const INITIAL_ASSIGNEES: Assignee[] = [
   { id: "alam", name: "Alam Tanvir", avatarColor: "bg-blue-600 text-white", role: "Lead Dev", email: "alamtanvir2006@gmail.com" },
-  { id: "john", name: "John Doe", avatarColor: "bg-amber-600 text-white", role: "Fullstack Dev", email: "john.doe@company.com" },
-  { id: "jane", name: "Jane Smith", avatarColor: "bg-pink-600 text-white", role: "QA Engineer", email: "jane.smith@company.com" },
-  { id: "sarah", name: "Sarah Connor", avatarColor: "bg-indigo-600 text-white", role: "Product Owner", email: "sarah.c@company.com" },
 ];
 
 export const INITIAL_ITEMS: BoardItem[] = [
@@ -43,7 +40,7 @@ export const INITIAL_ITEMS: BoardItem[] = [
     ],
     history: [
       { id: "hist-1-1", timestamp: "2026-06-10T08:30:00Z", user: "Server System", action: "Error automatically caught and ingested into board" },
-      { id: "hist-1-2", timestamp: "2026-06-10T09:00:00Z", user: "Sarah Connor", action: "Assigned item to Alam Tanvir and raised priority to URGENT" }
+      { id: "hist-1-2", timestamp: "2026-06-10T09:00:00Z", user: "Alam Tanvir", action: "Assigned item to Alam Tanvir and raised priority to URGENT" }
     ],
     createdDate: "2026-06-10T08:30:00Z"
   },
@@ -54,7 +51,7 @@ export const INITIAL_ITEMS: BoardItem[] = [
     type: ItemType.FEATURE,
     priority: Priority.MEDIUM,
     status: "in_progress",
-    assigneeId: "john",
+    assigneeId: "alam",
     storyPoints: 5,
     dueDate: "2026-06-18",
     tags: ["front", "api"],
@@ -64,8 +61,8 @@ export const INITIAL_ITEMS: BoardItem[] = [
       { id: "sub-2-3", title: "Wire Excel sheet styling schema options", completed: false }
     ],
     history: [
-      { id: "hist-2-1", timestamp: "2026-06-09T10:00:00Z", user: "Sarah Connor", action: "Created feature ticket from Product Backlog guidelines" },
-      { id: "hist-2-2", timestamp: "2026-06-10T09:15:00Z", user: "John Doe", action: "Moved item from 'To Do' to 'In Progress'" }
+      { id: "hist-2-1", timestamp: "2026-06-09T10:00:00Z", user: "Alam Tanvir", action: "Created feature ticket from Product Backlog guidelines" },
+      { id: "hist-2-2", timestamp: "2026-06-10T09:15:00Z", user: "Alam Tanvir", action: "Moved item from 'To Do' to 'In Progress'" }
     ],
     createdDate: "2026-06-09T10:00:00Z"
   },
@@ -76,7 +73,7 @@ export const INITIAL_ITEMS: BoardItem[] = [
     type: ItemType.BUG,
     priority: Priority.HIGH,
     status: "in_review",
-    assigneeId: "jane",
+    assigneeId: "alam",
     storyPoints: 2,
     dueDate: "2026-06-11",
     tags: ["front"],
@@ -85,8 +82,8 @@ export const INITIAL_ITEMS: BoardItem[] = [
       { id: "sub-3-2", title: "Test container shifts across representative screen sizes", completed: true },
     ],
     history: [
-      { id: "hist-3-1", timestamp: "2026-06-08T14:20:00Z", user: "Jane Smith", action: "Opened bug ticket from QA feedback cycles" },
-      { id: "hist-3-2", timestamp: "2026-06-10T09:10:00Z", user: "Jane Smith", action: "Moved item to 'In Review' for deployment clearance" }
+      { id: "hist-3-1", timestamp: "2026-06-08T14:20:00Z", user: "Alam Tanvir", action: "Opened bug ticket from QA feedback cycles" },
+      { id: "hist-3-2", timestamp: "2026-06-10T09:10:00Z", user: "Alam Tanvir", action: "Moved item to 'In Review' for deployment clearance" }
     ],
     createdDate: "2026-06-08T14:20:00Z"
   },
