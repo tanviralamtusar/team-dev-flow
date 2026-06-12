@@ -507,51 +507,6 @@ export default function App() {
     return <Auth onAuthenticated={handleAuthenticated} />;
   }
 
-  if (projects.length === 0 && !isAuthChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0b0f1a] p-4 text-center">
-        <div className="max-w-md w-full bg-white dark:bg-[#151b2b] p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
-          <FolderKanban className="w-16 h-16 text-indigo-500 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">No Projects Found</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-8">You haven't been added to any projects yet. Create your first workspace to start organizing your tasks.</p>
-          <button
-            onClick={handleCreateProject}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20"
-          >
-            Create First Project
-          </button>
-          
-          {invitations.length > 0 && (
-            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center justify-center gap-2">
-                <Bell className="w-4 h-4 text-amber-500" />
-                Pending Invitations ({invitations.length})
-              </h3>
-              <div className="space-y-3">
-                {invitations.map(inv => (
-                  <div key={inv.id} className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between text-left">
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{inv.projectName}</p>
-                      <p className="text-[10px] text-slate-500">From {inv.inviterName}</p>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      <button onClick={() => handleAcceptInvitation(inv)} className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-200 transition-colors">
-                        <Check className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleDeclineInvitation(inv)} className="p-1.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-200 transition-colors">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div id="devflow-root" className="min-h-screen bg-slate-50/50 dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
       
@@ -921,6 +876,41 @@ export default function App() {
               </div>
             </div>
             
+          </div>
+        )}
+
+        {/* No-project banner */}
+        {!activeProject && (
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <FolderKanban className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">No project selected</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                  {invitations.length > 0
+                    ? "You have pending invitations — accept one to join a project, or create your own."
+                    : "Create a new project or ask a teammate to invite you."}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              {invitations.length > 0 && (
+                <button
+                  onClick={() => setIsInvitationsOpen(true)}
+                  className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  View Invitations ({invitations.length})
+                </button>
+              )}
+              <button
+                onClick={handleCreateProject}
+                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Create Project
+              </button>
+            </div>
           </div>
         )}
 
