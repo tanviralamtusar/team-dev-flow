@@ -971,6 +971,7 @@ export default function App() {
           tags={tags}
           assignees={assignees}
           columns={columns.map(c => ({ id: c.id, title: c.title }))}
+          defaultColumnId={activeItem ? undefined : defaultColumnForNewItem}
           onClose={() => {
             setIsModalOpen(false);
             setActiveItem(undefined);

@@ -25,28 +25,30 @@ interface ItemModalProps {
   tags: Tag[];
   assignees: Assignee[];
   columns: { id: string; title: string }[];
+  defaultColumnId?: string;
   onClose: () => void;
   onSave: (item: BoardItem) => void;
   onDelete?: (id: string) => void;
   currentUser: string;
 }
 
-export default function ItemModal({ 
-  item, 
-  tags, 
-  assignees, 
-  columns, 
-  onClose, 
-  onSave, 
+export default function ItemModal({
+  item,
+  tags,
+  assignees,
+  columns,
+  defaultColumnId,
+  onClose,
+  onSave,
   onDelete,
-  currentUser 
+  currentUser
 }: ItemModalProps) {
   // Local form state
   const [title, setTitle] = useState(item?.title || "");
   const [description, setDescription] = useState(item?.description || "");
   const [type, setType] = useState<ItemType>(item?.type || ItemType.TASK);
   const [priority, setPriority] = useState<Priority>(item?.priority || Priority.MEDIUM);
-  const [status, setStatus] = useState(item?.status || "todo");
+  const [status, setStatus] = useState(item?.status || defaultColumnId || columns[0]?.id || "todo");
   const [assigneeId, setAssigneeId] = useState(item?.assigneeId || "");
   const [storyPoints, setStoryPoints] = useState<number>(item?.storyPoints || 0);
   const [dueDate, setDueDate] = useState(item?.dueDate || "");
