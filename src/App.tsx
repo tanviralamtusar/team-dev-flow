@@ -8,6 +8,7 @@ import {
 } from "./data";
 import Board from "./components/Board";
 import StatsView from "./components/StatsView";
+import TeammatesView from "./components/TeammatesView";
 import SettingsView from "./components/SettingsView";
 import ItemModal from "./components/ItemModal";
 import Auth from "./components/Auth";
@@ -63,10 +64,10 @@ export default function App() {
   const [activeUsersCount, setActiveUsersCount] = useState<number>(1);
 
   // --- Persistent Workspace States ---
-  const [items, setItems] = useState<BoardItem[]>([]);
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [assignees, setAssignees] = useState<Assignee[]>([]);
+  const [items, setItems] = useState<BoardItem[]>(INITIAL_ITEMS);
+  const [columns, setColumns] = useState<Column[]>(INITIAL_COLUMNS);
+  const [tags, setTags] = useState<Tag[]>(INITIAL_TAGS);
+  const [assignees, setAssignees] = useState<Assignee[]>(INITIAL_ASSIGNEES);
 
   // --- Auth & Project Check ---
   useEffect(() => {
@@ -214,8 +215,8 @@ export default function App() {
   const [isServerOnline, setIsServerOnline] = useState(true);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Active View Tab: 'board' | 'stats' | 'settings'
-  const [activeTab, setActiveTab] = useState<"board" | "stats" | "settings">("board");
+  // Active View Tab: 'board' | 'stats' | 'teammates' | 'settings'
+  const [activeTab, setActiveTab] = useState<"board" | "stats" | "teammates" | "settings">("board");
 
   // --- Filtering States ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -277,7 +278,7 @@ export default function App() {
         setAssignees(INITIAL_ASSIGNEES);
       }
     }
-  }, []);
+  }, [user, activeProject]);
 
   // Initial load + 15-second polling for live sync across tabs
   useEffect(() => {
@@ -722,6 +723,18 @@ export default function App() {
               Stats
             </button>
             <button
+              id="tab-teammates"
+              onClick={() => setActiveTab("teammates")}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === "teammates" 
+                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
+              }`}
+            >
+              <Users className="w-3 md:w-3.5 h-3 md:h-3.5" />
+              Teammates
+            </button>
+            <button
               id="tab-settings"
               onClick={() => setActiveTab("settings")}
               className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
@@ -971,6 +984,14 @@ export default function App() {
               columns={columns}
               assignees={assignees}
               onSelectFilter={handleSelectFilterFromStats}
+            />
+          )}
+
+          {activeTab === "teammates" && (
+            <TeammatesView
+              projectId={activeProject?.id || ""}
+              assignees={assignees}
+              onUpdateAssignees={handleUpdateAssignees}
             />
           )}
 
