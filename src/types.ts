@@ -80,6 +80,7 @@ export interface Project {
   name: string;
   ownerId: string;
   createdAt: string;
+  activeCount?: number;
 }
 
 export interface Invitation {

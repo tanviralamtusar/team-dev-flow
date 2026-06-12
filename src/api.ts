@@ -154,6 +154,9 @@ export const getProjects = () => request<Project[]>("/projects");
 export const createProject = (name: string) => 
   request<Project>("/projects", json("POST", { name }));
 
+export const sendHeartbeat = (projectId: string) =>
+  request<{ activeCount: number }>(`/projects/${projectId}/heartbeat`, json("POST", {}));
+
 // ── Invitations ───────────────────────────────────────────────────────────────
 export const getInvitations = () => request<Invitation[]>("/invitations");
 

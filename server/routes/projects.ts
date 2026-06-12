@@ -5,6 +5,8 @@ import { AuthRequest } from "../middleware/auth.js";
 
 const router = Router();
 
+const activeUsers: Record<string, Record<string, number>> = {};
+
 // GET /api/projects - List projects user is member of
 router.get("/", (req: AuthRequest, res: Response) => {
   try {
@@ -14,7 +16,21 @@ router.get("/", (req: AuthRequest, res: Response) => {
       JOIN project_members pm ON p.id = pm.projectId
       WHERE pm.userId = ?
     `).all(userId);
-    res.json(projects);
+    
+    const now = Date.now();
+    const enrichedProjects = projects.map((p: any) => {
+      let activeCount = 0;
+      if (activeUsers[p.id]) {
+        for (const uid in activeUsers[p.id]) {
+          if (now - activeUsers[p.id][uid] < 30000) {
+            activeCount++;
+          }
+        }
+      }
+      return { ...p, activeCount };
+    });
+    
+    res.json(enrichedProjects);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch projects" });
   }
@@ -52,6 +68,32 @@ router.post("/", (req: AuthRequest, res: Response) => {
     console.error("Project creation error:", error);
     res.status(500).json({ error: "Failed to create project" });
   }
+});
+
+// POST /api/projects/:id/heartbeat
+router.post("/:id/heartbeat", (req: AuthRequest, res: Response) => {
+  const projectId = req.params.id;
+  const userId = req.user?.userId;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!activeUsers[projectId]) {
+    activeUsers[projectId] = {};
+  }
+  
+  const now = Date.now();
+  activeUsers[projectId][userId] = now;
+
+  // Cleanup old users and count active (e.g. seen in last 30 seconds)
+  let activeCount = 0;
+  for (const uid in activeUsers[projectId]) {
+    if (now - activeUsers[projectId][uid] < 30000) {
+      activeCount++;
+    } else {
+      delete activeUsers[projectId][uid];
+    }
+  }
+
+  res.json({ activeCount });
 });
 
 export default router;

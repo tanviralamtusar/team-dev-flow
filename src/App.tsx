@@ -42,7 +42,8 @@ import {
   Bell,
   ChevronDown,
   Check,
-  X
+  X,
+  Users
 } from "lucide-react";
 
 // REST API client (SQLite backend)
@@ -59,6 +60,7 @@ export default function App() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isProjectsDropdownOpen, setIsProjectsDropdownOpen] = useState(false);
   const [isInvitationsOpen, setIsInvitationsOpen] = useState(false);
+  const [activeUsersCount, setActiveUsersCount] = useState<number>(1);
 
   // --- Persistent Workspace States ---
   const [items, setItems] = useState<BoardItem[]>([]);
@@ -230,22 +232,26 @@ export default function App() {
   // --- Load all data from the REST API ---
   const fetchAllData = useCallback(async () => {
     if (!user || !activeProject) return;
-    try {
-      const healthy = await api.checkHealth();
-      if (!healthy) throw new Error("Server offline");
-      setIsServerOnline(true);
+      try {
+        const healthy = await api.checkHealth();
+        if (!healthy) throw new Error("Server offline");
+        setIsServerOnline(true);
 
-      const [fetchedItems, fetchedColumns, fetchedTags, fetchedAssignees] = await Promise.all([
-        api.getItems(),
-        api.getColumns(),
-        api.getTags(),
-        api.getAssignees(),
-      ]);
+        const [fetchedItems, fetchedColumns, fetchedTags, fetchedAssignees, heartbeat, fetchedProjects] = await Promise.all([
+          api.getItems(),
+          api.getColumns(),
+          api.getTags(),
+          api.getAssignees(),
+          api.sendHeartbeat(activeProject.id),
+          api.getProjects()
+        ]);
 
-      setItems(fetchedItems);
-      setColumns(fetchedColumns.length > 0 ? fetchedColumns : INITIAL_COLUMNS);
-      setTags(fetchedTags.length > 0 ? fetchedTags : INITIAL_TAGS);
-      setAssignees(fetchedAssignees.length > 0 ? fetchedAssignees : INITIAL_ASSIGNEES);
+        setItems(fetchedItems);
+        setColumns(fetchedColumns.length > 0 ? fetchedColumns : INITIAL_COLUMNS);
+        setTags(fetchedTags.length > 0 ? fetchedTags : INITIAL_TAGS);
+        setAssignees(fetchedAssignees.length > 0 ? fetchedAssignees : INITIAL_ASSIGNEES);
+        setActiveUsersCount(heartbeat.activeCount);
+        setProjects(fetchedProjects);
 
       // Mirror to localStorage as offline cache
       localStorage.setItem("dev_board_items", JSON.stringify(fetchedItems));
@@ -522,12 +528,18 @@ export default function App() {
                 onClick={() => setIsProjectsDropdownOpen(!isProjectsDropdownOpen)}
                 className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-all text-left"
               >
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-display font-medium text-xs md:text-sm tracking-wider text-white uppercase">{activeProject?.name || "No Project"}</span>
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                  <p className="text-[9px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-display font-medium text-xs md:text-sm tracking-wider text-white uppercase">{activeProject?.name || "No Project"}</span>
+                      {activeProject && (
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-800/50 border border-slate-700 text-[10px] text-slate-300 ml-1">
+                          <Users className="w-3 h-3" />
+                          <span>{activeUsersCount} {activeUsersCount === 1 ? 'Teammate' : 'Teammates'}</span>
+                        </div>
+                      )}
+                      <ChevronDown className="w-3 h-3 text-slate-400 ml-1" />
+                    </div>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider">
                     {isServerOnline ? "SQLITE — LIVE" : "OFFLINE"}
                   </p>
                 </div>
@@ -536,22 +548,30 @@ export default function App() {
               {isProjectsDropdownOpen && (
                 <div className="absolute left-0 top-full mt-2 w-64 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 p-2 animate-in fade-in slide-in-from-top-1">
                   <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono px-3 py-2 uppercase tracking-widest border-b border-slate-50 dark:border-slate-800/50 mb-1">Your Workspaces</p>
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {projects.map(p => (
-                      <button
-                        key={p.id}
-                        onClick={() => handleSwitchProject(p)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all mb-1 ${
-                          activeProject?.id === p.id 
-                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold" 
-                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                        }`}
-                      >
-                        <span className="truncate">{p.name}</span>
-                        {activeProject?.id === p.id && <Check className="w-4 h-4 shrink-0" />}
-                      </button>
-                    ))}
-                  </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {projects.map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => handleSwitchProject(p)}
+                          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all mb-1 ${
+                            activeProject?.id === p.id 
+                              ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold" 
+                              : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <span className="truncate">{p.name}</span>
+                            {(p.activeCount ?? 0) > 0 && (
+                              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[9px] text-slate-500 shrink-0">
+                                <Users className="w-2.5 h-2.5" />
+                                <span>{p.activeCount}</span>
+                              </div>
+                            )}
+                          </div>
+                          {activeProject?.id === p.id && <Check className="w-4 h-4 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
                   <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50 mt-1">
                     <button
                       onClick={handleCreateProject}
