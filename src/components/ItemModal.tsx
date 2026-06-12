@@ -333,7 +333,7 @@ export default function ItemModal({
                     className="hidden" 
                   />
                   <Upload className="w-6 h-6 text-slate-400 dark:text-slate-500 mb-1.5" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Drag & drop images here, or <span className="text-indigo-650 dark:text-indigo-400 font-bold hover:underline">browse</span></span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Drag & drop images here, or <span className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">browse</span></span>
                   <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Lightweight optimised snapshots (JPG, PNG, GIF)</span>
                 </div>
 
@@ -565,7 +565,7 @@ export default function ItemModal({
                         onClick={() => handleToggleTag(tg.id)}
                         className={`px-2.5 py-1 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition-all ${
                           checked 
-                            ? `${tg.bgClass} border-slate-350 dark:border-slate-700 shadow-xs font-black` 
+                            ? `${tg.bgClass} shadow-xs font-black` 
                             : "bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                         }`}
                       >

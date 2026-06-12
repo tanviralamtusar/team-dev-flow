@@ -9,12 +9,12 @@ export const INITIAL_COLUMNS: Column[] = [
 ];
 
 export const INITIAL_TAGS: Tag[] = [
-  { id: "front", name: "Frontend", color: "sky", bgClass: "bg-sky-50 text-sky-700 border-sky-100", textClass: "text-sky-700" },
-  { id: "back", name: "Backend", color: "indigo", bgClass: "bg-indigo-50 text-indigo-700 border-indigo-100", textClass: "text-indigo-700" },
-  { id: "api", name: "API Rate", color: "emerald", bgClass: "bg-emerald-50 text-emerald-700 border-emerald-100", textClass: "text-emerald-700" },
-  { id: "sec", name: "Security", color: "rose", bgClass: "bg-rose-50 text-rose-700 border-rose-100", textClass: "text-rose-700" },
-  { id: "perf", name: "Performance", color: "amber", bgClass: "bg-amber-50 text-amber-700 border-amber-100", textClass: "text-amber-700" },
-  { id: "qa", name: "QA Verified", color: "fuchsia", bgClass: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100", textClass: "text-fuchsia-700" },
+  { id: "front", name: "Frontend", color: "sky", bgClass: "bg-sky-400/10 text-sky-400 border-sky-400/20", textClass: "text-sky-400" },
+  { id: "back", name: "Backend", color: "indigo", bgClass: "bg-indigo-400/10 text-indigo-400 border-indigo-400/20", textClass: "text-indigo-400" },
+  { id: "api", name: "API Rate", color: "emerald", bgClass: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20", textClass: "text-emerald-400" },
+  { id: "sec", name: "Security", color: "rose", bgClass: "bg-rose-400/10 text-rose-400 border-rose-400/20", textClass: "text-rose-400" },
+  { id: "perf", name: "Performance", color: "amber", bgClass: "bg-amber-400/10 text-amber-400 border-amber-400/20", textClass: "text-amber-400" },
+  { id: "qa", name: "QA Verified", color: "fuchsia", bgClass: "bg-fuchsia-400/10 text-fuchsia-400 border-fuchsia-400/20", textClass: "text-fuchsia-400" },
 ];
 
 export const INITIAL_ASSIGNEES: Assignee[] = [

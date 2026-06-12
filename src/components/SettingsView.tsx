@@ -29,12 +29,12 @@ interface SettingsViewProps {
 }
 
 const COLOR_TEMPLATES = [
-  { id: "sky", name: "Sky Blue", bgClass: "bg-sky-50 text-sky-700 border-sky-100", textClass: "text-sky-700" },
-  { id: "indigo", name: "Royal Purple", bgClass: "bg-indigo-50 text-indigo-700 border-indigo-100", textClass: "text-indigo-700" },
-  { id: "emerald", name: "Teal Green", bgClass: "bg-emerald-50 text-emerald-700 border-emerald-100", textClass: "text-emerald-700" },
-  { id: "rose", name: "Coral Rose", bgClass: "bg-rose-50 text-rose-700 border-rose-100", textClass: "text-rose-700" },
-  { id: "amber", name: "Warm Amber", bgClass: "bg-amber-50 text-amber-700 border-amber-100", textClass: "text-amber-755" },
-  { id: "fuchsia", name: "Magenta Pink", bgClass: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100", textClass: "text-fuchsia-700" },
+  { id: "sky", name: "Sky Blue", bgClass: "bg-sky-400/10 text-sky-400 border-sky-400/20", textClass: "text-sky-400" },
+  { id: "indigo", name: "Royal Purple", bgClass: "bg-indigo-400/10 text-indigo-400 border-indigo-400/20", textClass: "text-indigo-400" },
+  { id: "emerald", name: "Teal Green", bgClass: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20", textClass: "text-emerald-400" },
+  { id: "rose", name: "Coral Rose", bgClass: "bg-rose-400/10 text-rose-400 border-rose-400/20", textClass: "text-rose-400" },
+  { id: "amber", name: "Warm Amber", bgClass: "bg-amber-400/10 text-amber-400 border-amber-400/20", textClass: "text-amber-400" },
+  { id: "fuchsia", name: "Magenta Pink", bgClass: "bg-fuchsia-400/10 text-fuchsia-400 border-fuchsia-400/20", textClass: "text-fuchsia-400" },
 ];
 
 const AVATAR_COLORS = [
@@ -151,13 +151,13 @@ export default function SettingsView({
             {tags.map((tg) => (
               <span 
                 key={tg.id} 
-                className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl border border-slate-100 dark:border-slate-700 text-[10px] font-bold uppercase shadow-xs ${tg.bgClass}`}
+                className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl border text-[10px] font-bold uppercase shadow-xs ${tg.bgClass}`}
               >
                 {tg.name}
                 <button 
                   type="button"
                   onClick={() => handleDeleteTag(tg.id, tg.name)}
-                  className="p-0.5 text-slate-650 dark:text-slate-300 hover:text-rose-650 dark:hover:text-rose-400 text-slate-600 rounded cursor-pointer animate-fade-in"
+                  className="p-0.5 text-slate-500 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 rounded cursor-pointer animate-fade-in"
                 >
                   <X className="w-3 h-3" />
                 </button>

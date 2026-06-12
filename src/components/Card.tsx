@@ -180,7 +180,7 @@ export default function Card({ item, tags, assignee, onEditItem, onMoveItem, col
             {itemTags.map((t) => (
               <span 
                 key={t.id} 
-                className={`px-1.5 py-0.5 rounded text-[9px] font-bold border border-transparent ${t.bgClass}`}
+                className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${t.bgClass}`}
               >
                 {t.name}
               </span>

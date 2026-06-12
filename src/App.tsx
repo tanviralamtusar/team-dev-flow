@@ -905,8 +905,8 @@ export default function App() {
                     onClick={() => setSelectedTag(selectedTag === t.id ? "" : t.id)}
                     className={`px-2.5 py-1 text-[10px] uppercase border transition-all cursor-pointer font-bold ${
                       selectedTag === t.id 
-                        ? `${t.bgClass} border-transparent shadow-xs font-bold rounded-xl` 
-                        : "bg-slate-50/60 dark:bg-slate-800/40 text-slate-450 dark:text-slate-400 text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all font-semibold"
+                        ? `${t.bgClass} shadow-xs font-bold rounded-xl` 
+                        : "bg-white dark:bg-[#1e293b] text-slate-450 dark:text-slate-400 text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all font-semibold"
                     }`}
                   >
                     {t.name}
