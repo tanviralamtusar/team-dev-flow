@@ -8,8 +8,6 @@ COPY public ./public
 COPY src ./src
 COPY server ./server
 COPY assets ./assets
-COPY data ./data
-COPY uploads ./uploads
 RUN npm ci
 RUN npm run build
 
@@ -26,8 +24,8 @@ COPY package.json package-lock.json tsconfig.json ./
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/server ./server
 COPY --from=build /usr/src/app/src ./src
-COPY --from=build /usr/src/app/data ./data
-COPY --from=build /usr/src/app/uploads ./uploads
+# Create empty directories — actual data lives in Docker volumes, not the image
+RUN mkdir -p data uploads
 RUN npm ci --production
 
 EXPOSE 4000
