@@ -12,6 +12,14 @@ const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 
+// Flush any uncommitted WAL data into the main DB file on startup
+db.pragma("wal_checkpoint(TRUNCATE)");
+
+// Flush WAL to main DB file on clean shutdown so data survives restarts
+process.on("exit", () => db.pragma("wal_checkpoint(TRUNCATE)"));
+process.on("SIGINT", () => { db.pragma("wal_checkpoint(TRUNCATE)"); process.exit(0); });
+process.on("SIGTERM", () => { db.pragma("wal_checkpoint(TRUNCATE)"); process.exit(0); });
+
 // ── Table Definitions ──────────────────────────────────────────────────────────
 
 db.exec(`
