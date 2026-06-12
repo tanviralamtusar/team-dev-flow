@@ -106,6 +106,29 @@ export default function App() {
     checkAuth();
   }, []);
 
+  const handleAuthenticated = async (u: any) => {
+    setUser(u);
+    try {
+      const fetchedProjects = await api.getProjects();
+      setProjects(fetchedProjects);
+
+      const savedProjectId = localStorage.getItem("current_project_id");
+      const restored = fetchedProjects.find(p => p.id === savedProjectId);
+      if (restored) {
+        setActiveProject(restored);
+        api.setProjectId(restored.id);
+      } else if (fetchedProjects.length > 0) {
+        setActiveProject(fetchedProjects[0]);
+        api.setProjectId(fetchedProjects[0].id);
+      }
+
+      const fetchedInvs = await api.getInvitations();
+      setInvitations(fetchedInvs);
+    } catch {
+      // Projects/invitations fetch failed — user is still logged in
+    }
+  };
+
   const handleLogout = () => {
     api.setToken(null);
     api.setProjectId(null);
@@ -481,7 +504,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <Auth onAuthenticated={(u) => setUser(u)} />;
+    return <Auth onAuthenticated={handleAuthenticated} />;
   }
 
   if (projects.length === 0 && !isAuthChecking) {
