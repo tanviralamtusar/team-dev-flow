@@ -41,15 +41,35 @@ router.post("/invite", (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: "You are not a member of this project" });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check invitee is a registered user
+    const invitee = db.prepare("SELECT id FROM users WHERE email = ?").get(normalizedEmail) as { id: string } | undefined;
+    if (!invitee) {
+      return res.status(404).json({ error: "No account found with that email address. They must register first." });
+    }
+
+    // Prevent inviting existing members
+    const alreadyMember = db.prepare("SELECT 1 FROM project_members WHERE projectId = ? AND userId = ?").get(projectId, invitee.id);
+    if (alreadyMember) {
+      return res.status(400).json({ error: "This user is already a member of the project" });
+    }
+
+    // Prevent duplicate pending invitations
+    const existing = db.prepare("SELECT id FROM invitations WHERE projectId = ? AND email = ? AND status = 'pending'").get(projectId, normalizedEmail);
+    if (existing) {
+      return res.status(400).json({ error: "A pending invitation already exists for this email" });
+    }
+
     const id = uuidv4();
     const createdAt = new Date().toISOString();
 
     db.prepare(`
       INSERT INTO invitations (id, projectId, inviterId, email, status, createdAt)
       VALUES (?, ?, ?, ?, 'pending', ?)
-    `).run(id, projectId, inviterId, email.toLowerCase(), createdAt);
+    `).run(id, projectId, inviterId, normalizedEmail, createdAt);
 
-    res.status(201).json({ id, projectId, email, status: 'pending' });
+    res.status(201).json({ id, projectId, email: normalizedEmail, status: 'pending' });
   } catch (error) {
     res.status(500).json({ error: "Failed to send invitation" });
   }
@@ -72,8 +92,10 @@ router.post("/:id/accept", (req: AuthRequest, res: Response) => {
     }
 
     const acceptTransaction = db.transaction(() => {
-      db.prepare("UPDATE invitations SET status = 'accepted' WHERE id = ?").run(id);
-      
+      // Mark all pending invitations for this user+project as accepted
+      db.prepare("UPDATE invitations SET status = 'accepted' WHERE projectId = ? AND email = ? AND status = 'pending'")
+        .run(invitation.projectId, user.email);
+
       db.prepare(`
         INSERT OR IGNORE INTO project_members (projectId, userId, role, createdAt)
         VALUES (?, ?, 'member', ?)
