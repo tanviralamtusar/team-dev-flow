@@ -291,16 +291,24 @@ export default function App() {
   
   // Handler: Save ticket details (Add or update existing)
   const handleSaveItem = async (savedItem: BoardItem) => {
+    // Optimistic UI update
+    const isNew = !items.some(i => i.id === savedItem.id);
+    setItems((prevItems) => {
+      if (isNew) return [savedItem, ...prevItems];
+      return prevItems.map((item) => (item.id === savedItem.id ? savedItem : item));
+    });
+
     try {
-      await api.saveItem(savedItem);
+      if (isNew) {
+        await api.saveItem(savedItem);
+      } else {
+        await api.updateItem(savedItem.id, savedItem);
+      }
       await fetchAllData();
-    } catch {
-      // Offline fallback — update local state
-      setItems((prevItems) => {
-        const exists = prevItems.some((item) => item.id === savedItem.id);
-        if (exists) return prevItems.map((item) => (item.id === savedItem.id ? savedItem : item));
-        return [savedItem, ...prevItems];
-      });
+    } catch (err) {
+      console.error("Failed to save ticket to server:", err);
+      setIsServerOnline(false);
+      // Data remains in local state (optimistically updated above)
     }
     setIsModalOpen(false);
     setActiveItem(undefined);
@@ -365,11 +373,9 @@ export default function App() {
   };
 
   const handleUpdateAssignees = async (nextAssignees: Assignee[]) => {
-    const deleted = assignees.filter((a) => !nextAssignees.some((na) => na.id === a.id));
     setAssignees(nextAssignees);
     try {
-      for (const a of deleted) await api.deleteAssignee(a.id).catch(() => {});
-      for (const a of nextAssignees) await api.saveAssignee(a).catch(() => {});
+      await api.updateAssignees(nextAssignees);
     } catch { console.warn("Assignee sync failed — offline mode"); }
   };
 

@@ -134,6 +134,9 @@ export const getAssignees = () => request<Assignee[]>("/assignees");
 export const saveAssignee = (assignee: Assignee) =>
   request<Assignee>("/assignees", json("POST", assignee));
 
+export const updateAssignees = (assignees: Assignee[]) =>
+  request<{ success: boolean }>("/assignees/bulk", json("POST", { assignees }));
+
 export const deleteAssignee = (id: string) =>
   request<{ success: boolean }>(`/assignees/${id}`, { method: "DELETE" });
 
