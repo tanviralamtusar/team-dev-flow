@@ -542,31 +542,25 @@ export default function App() {
     <div id="devflow-root" className="min-h-screen bg-white dark:bg-[#0b0f1a] flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased select-none">
       
       {/* Upper Unified Premium Header - Minimalist styling with responsive micro items */}
-      <header className="bg-white dark:bg-[#080c14] text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800/50 shadow-xs backdrop-blur-md">
-        <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-auto py-3 md:h-16">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 md:w-9 md:h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
+      <header className="bg-white dark:bg-[#080c14] text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800/50 shadow-xs backdrop-blur-md sticky top-0 z-40">
+        <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm shrink-0">
               <Terminal className="w-4 h-4 md:w-5 md:h-5 animate-pulse" />
             </div>
-            <div className="relative group">
+            <div className="relative flex flex-col min-w-0">
               <button 
                 onClick={() => setIsProjectsDropdownOpen(!isProjectsDropdownOpen)}
-                className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-all text-left"
+                className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-all text-left min-w-0"
               >
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-display font-medium text-xs md:text-sm tracking-wider text-slate-900 dark:text-white uppercase">{activeProject?.name || "No Project"}</span>
-                      {activeProject && (
-                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-800/50 border border-slate-700 text-[10px] text-slate-300 ml-1">
-                          <Users className="w-3 h-3" />
-                          <span>{activeUsersCount} {activeUsersCount === 1 ? 'Teammate' : 'Teammates'}</span>
-                        </div>
-                      )}
-                      <ChevronDown className="w-3 h-3 text-slate-400 ml-1" />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span className="font-display font-bold text-xs md:text-sm tracking-wider text-slate-900 dark:text-white uppercase truncate">{activeProject?.name || "No Project"}</span>
+                      <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                     </div>
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider">
-                    {isServerOnline ? "SQLITE — LIVE" : "OFFLINE"}
-                  </p>
+                    <p className="text-[8px] md:text-[10px] text-slate-400 font-mono uppercase tracking-wider truncate">
+                      {isServerOnline ? "SQLITE — LIVE" : "OFFLINE"}
+                    </p>
                 </div>
               </button>
               
@@ -628,7 +622,7 @@ export default function App() {
           </div>
 
           {/* Connected User Badge */}
-          <div className="flex items-center gap-2 md:gap-4 font-sans">
+          <div className="flex items-center gap-1.5 md:gap-4 font-sans">
             {/* Invitations Notification */}
             <div className="relative">
               <button
@@ -638,7 +632,7 @@ export default function App() {
               >
                 <Bell className="w-4 h-4 md:w-5 md:h-5" />
                 {invitations.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-slate-900 animate-bounce">
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 md:w-4 md:h-4 bg-amber-500 text-white text-[8px] md:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 animate-bounce">
                     {invitations.length}
                   </span>
                 )}
@@ -688,12 +682,12 @@ export default function App() {
             >
               {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
-            <div className="flex items-center gap-2 md:gap-2.5">
+            <div className="flex items-center gap-1 md:gap-2.5">
               <div className="text-right hidden sm:block">
                 <span className="text-[9px] text-indigo-400 dark:text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
                 <span className="text-xs font-semibold text-white dark:text-slate-200 block tracking-tight">{user?.username}</span>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm">
+              <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm shrink-0">
                 {user?.username?.substring(0, 2).toUpperCase()}
               </div>
               <button
@@ -712,74 +706,45 @@ export default function App() {
       <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
         
         {/* Navigation Action combined block */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-4 rounded-2xl shadow-xs">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-3 md:p-4 rounded-2xl shadow-xs">
           
           {/* Active Navigation Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100/60 dark:bg-slate-800/40 p-1 rounded-xl w-full sm:w-auto overflow-x-auto no-scrollbar">
-            <button
-              id="tab-board"
-              onClick={() => setActiveTab("board")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "board" 
-                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
-              }`}
-            >
-              <Layers className="w-3 md:w-3.5 h-3 md:h-3.5" />
-              Board
-            </button>
-            <button
-              id="tab-stats"
-              onClick={() => setActiveTab("stats")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "stats" 
-                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
-              }`}
-            >
-              <TrendingUp className="w-3 md:w-3.5 h-3 md:h-3.5" />
-              Stats
-            </button>
-            <button
-              id="tab-teammates"
-              onClick={() => setActiveTab("teammates")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "teammates" 
-                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
-              }`}
-            >
-              <Users className="w-3 md:w-3.5 h-3 md:h-3.5" />
-              Teammates
-            </button>
-            <button
-              id="tab-settings"
-              onClick={() => setActiveTab("settings")}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-1.5 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "settings" 
-                  ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
-              }`}
-            >
-              <Settings className="w-3 md:w-3.5 h-3 md:h-3.5" />
-              Setup
-            </button>
+          <div className="flex items-center gap-1 bg-slate-100/60 dark:bg-slate-800/40 p-1 rounded-xl overflow-x-auto no-scrollbar">
+            {[
+              { id: "board", label: "Board", icon: <Layers className="w-3.5 h-3.5" /> },
+              { id: "stats", label: "Stats", icon: <TrendingUp className="w-3.5 h-3.5" /> },
+              { id: "teammates", label: "Teammates", icon: <Users className="w-3.5 h-3.5" /> },
+              { id: "settings", label: "Setup", icon: <Settings className="w-3.5 h-3.5" /> },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 md:px-4 py-2 text-[10px] md:text-[11px] font-display uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === tab.id 
+                    ? "bg-slate-950 dark:bg-indigo-600 text-white font-bold" 
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-700/40"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Quick Addition & Alerts Options */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
             {/* Auto Ingest Error Dropdown */}
-            <div className="relative group flex-1 sm:flex-initial">
+            <div className="relative group flex-1 md:flex-initial">
               <button
                 id="btn-trigger-exception"
                 className="w-full px-3 py-2.5 bg-white dark:bg-[#1e293b] hover:bg-slate-50/60 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-[10px] md:text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
-                <Zap className="w-3 md:w-3.5 h-3 md:h-3.5 text-indigo-505" />
+                <Zap className="w-3 md:w-3.5 h-3 md:h-3.5 text-indigo-500" />
                 <span className="whitespace-nowrap">Crash Hook</span>
               </button>
               
               {/* Dropdown Options List */}
-              <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-700 rounded-xl shadow-md p-2 hidden group-hover:block hover:block z-20">
+              <div className="absolute right-0 bottom-full md:bottom-auto md:top-full mb-2 md:mb-0 md:mt-1.5 w-56 bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-700 rounded-xl shadow-md p-2 hidden group-hover:block hover:block z-20">
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono p-2 border-b border-slate-100 dark:border-slate-700">SIMULATE REAL EXCEPTION</p>
                 <button 
                   onClick={() => handleSimulateErrorAlert("redis_crash")}
@@ -812,7 +777,7 @@ export default function App() {
                 setDefaultColumnForNewItem("backlog");
                 setIsModalOpen(true);
               }}
-              className="flex-1 sm:flex-initial px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] md:text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm border-0"
+              className="flex-1 md:flex-initial px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] md:text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm border-0"
             >
               <Plus className="w-3.5 md:w-4 h-3.5 md:h-4" />
               <span className="whitespace-nowrap">Add Ticket</span>
@@ -823,8 +788,8 @@ export default function App() {
 
         {/* Board Search and Filtering Utility Bar */}
         {activeTab === "board" && (
-          <div className="bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-4 rounded-2xl shadow-xs flex flex-col gap-3">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-3 md:p-4 rounded-2xl shadow-xs flex flex-col gap-3">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
               
               {/* Search Element input */}
               <div className="relative flex-1">
@@ -832,7 +797,7 @@ export default function App() {
                 <input
                   id="global-search-query"
                   type="text"
-                  placeholder="Query ticket name, description guideline, or ID..."
+                  placeholder="Query ticket, description or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-10 pr-4 py-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] transition-all text-slate-600 dark:text-slate-300 placeholder-slate-400/60 shadow-xs"
@@ -840,20 +805,20 @@ export default function App() {
               </div>
 
               {/* Filtering Controls options dropdown group */}
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
                 
                 {/* Type Filter */}
                 <select
                   title="Filter type"
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="flex-1 sm:flex-initial bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
+                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[10px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
                   <option value="">All Types</option>
                   <option value={ItemType.TASK}>Task</option>
                   <option value={ItemType.BUG}>Bug</option>
                   <option value={ItemType.ERROR}>Error</option>
-                  <option value={ItemType.FEATURE}>Feature Request</option>
+                  <option value={ItemType.FEATURE}>Feature</option>
                 </select>
 
                 {/* Priority Filter */}
@@ -861,7 +826,7 @@ export default function App() {
                   title="Filter priority"
                   value={selectedPriority}
                   onChange={(e) => setSelectedPriority(e.target.value)}
-                  className="flex-1 sm:flex-initial bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
+                  className="bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[10px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
                   <option value="">All Priority</option>
                   <option value={Priority.URGENT}>Urgent</option>
@@ -875,7 +840,7 @@ export default function App() {
                   title="Filter assignee"
                   value={selectedAssignee}
                   onChange={(e) => setSelectedAssignee(e.target.value)}
-                  className="flex-1 sm:flex-initial bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-405 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
+                  className="col-span-2 sm:col-auto bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-[10px] md:text-xs text-slate-600 dark:text-slate-300 rounded-xl p-2 md:p-2.5 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-[#1e293b] cursor-pointer shadow-xs"
                 >
                   <option value="">All Devs</option>
                   {assignees.map((as) => (
@@ -888,7 +853,7 @@ export default function App() {
                   <button
                     id="btn-clear-filters"
                     onClick={handleClearFilters}
-                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] md:text-xs font-semibold border border-transparent rounded-xl transition-all cursor-pointer shadow-xs"
+                    className="col-span-2 sm:col-auto flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] md:text-xs font-semibold border border-transparent rounded-xl transition-all cursor-pointer shadow-xs"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     Reset
@@ -900,18 +865,18 @@ export default function App() {
 
             {/* Quick Tag Filtering Toggles Row */}
             <div className="flex items-center gap-2 border-t border-slate-50 dark:border-slate-800/60 pt-3 overflow-x-auto select-none no-scrollbar">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider flex items-center gap-shrink-0">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider flex items-center shrink-0">
                 <Filter className="w-3 h-3 text-slate-400 mr-1" />
-                TAG CLASSIFICATION:
+                TAGS:
               </span>
-              <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
+              <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar">
                 <button
                   type="button"
                   onClick={() => setSelectedTag("")}
-                  className={`px-3 py-1 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer shrink-0 ${
                     selectedTag === "" 
                       ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-xs" 
-                      : "bg-slate-50/60 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 transition-all font-semibold"
+                      : "bg-slate-50/60 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 transition-all"
                   }`}
                 >
                   ALL
@@ -921,10 +886,10 @@ export default function App() {
                     type="button"
                     key={t.id}
                     onClick={() => setSelectedTag(selectedTag === t.id ? "" : t.id)}
-                    className={`px-2.5 py-1 text-[10px] uppercase border transition-all cursor-pointer font-bold ${
+                    className={`px-2.5 py-1 text-[10px] uppercase border transition-all cursor-pointer font-bold rounded-xl shrink-0 ${
                       selectedTag === t.id 
-                        ? `${t.bgClass} shadow-xs font-bold rounded-xl` 
-                        : "bg-white dark:bg-[#1e293b] text-slate-450 dark:text-slate-400 text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all font-semibold"
+                        ? `${t.bgClass} shadow-xs` 
+                        : "bg-white dark:bg-[#1e293b] text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700"
                     }`}
                   >
                     {t.name}

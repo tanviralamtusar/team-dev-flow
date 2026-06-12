@@ -88,7 +88,7 @@ export default function Board({
   return (
     <div 
       id="kanban-board-scroller" 
-      className="flex gap-4 md:gap-5 overflow-x-auto pb-6 pt-2 select-none scrollbar-thin snap-x snap-mandatory font-sans px-0.5 md:px-0"
+      className="flex gap-4 md:gap-5 overflow-x-auto pb-6 pt-2 select-none scrollbar-thin snap-x snap-mandatory font-sans px-4 md:px-0"
     >
       {columns.map((col) => {
         const columnItems = filteredItems.filter((i) => i.status === col.id);
