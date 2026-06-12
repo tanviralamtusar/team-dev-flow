@@ -525,7 +525,7 @@ export default function App() {
       
       {/* Upper Unified Premium Header - Minimalist styling with responsive micro items */}
       <header className="bg-slate-900 dark:bg-[#080c14] text-white border-b border-slate-800/10 dark:border-slate-800/50 shadow-xs backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-auto py-3 md:h-16">
+        <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-auto py-3 md:h-16">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 md:w-9 md:h-9 bg-indigo-600 border-0 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-sm">
               <Terminal className="w-4 h-4 md:w-5 md:h-5 animate-pulse" />
@@ -691,7 +691,7 @@ export default function App() {
       </header>
 
       {/* Main Container Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
         
         {/* Navigation Action combined block */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] p-4 rounded-2xl shadow-xs">
@@ -1031,7 +1031,7 @@ export default function App() {
 
       {/* Pure Human Footer Credits */}
       <footer className="bg-white dark:bg-[#080c14] border-t border-slate-100 dark:border-slate-800/50 py-6 text-center text-slate-500 text-xs mt-auto">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3 font-mono uppercase tracking-wider text-[11px]">
+        <div className="px-4 flex flex-col sm:flex-row justify-between items-center gap-3 font-mono uppercase tracking-wider text-[11px]">
           <p className="leading-tight text-slate-400 dark:text-slate-500 font-bold">
             Dev Kanban Board &copy; 2026. Live Operations Database.
           </p>
