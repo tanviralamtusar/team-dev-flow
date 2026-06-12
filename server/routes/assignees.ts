@@ -16,6 +16,30 @@ router.get("/", verifyProjectMember, (req: AuthRequest, res: Response) => {
   }
 });
 
+// POST /api/assignees/bulk
+router.post("/bulk", verifyProjectMember, (req: AuthRequest, res: Response) => {
+  try {
+    const { projectId, assignees } = req.body;
+    if (!projectId) return res.status(400).json({ error: "Missing projectId" });
+    if (!Array.isArray(assignees)) return res.status(400).json({ error: "assignees must be an array" });
+
+    const deleteStmt = db.prepare("DELETE FROM assignees WHERE projectId = ?");
+    const insertStmt = db.prepare("INSERT INTO assignees (id, projectId, data) VALUES (?, ?, ?)");
+
+    const sync = db.transaction((list: any[]) => {
+      deleteStmt.run(projectId);
+      for (const a of list) {
+        insertStmt.run(a.id, projectId, JSON.stringify(a));
+      }
+    });
+
+    sync(assignees);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to bulk update assignees" });
+  }
+});
+
 // POST /api/assignees
 router.post("/", verifyProjectMember, (req: AuthRequest, res: Response) => {
   try {
