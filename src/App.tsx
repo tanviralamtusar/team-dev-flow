@@ -245,6 +245,7 @@ export default function App() {
 
   // --- Modal Management States ---
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalReadOnly, setIsModalReadOnly] = useState(false);
   const [activeItem, setActiveItem] = useState<BoardItem | undefined>(undefined);
   const [defaultColumnForNewItem, setDefaultColumnForNewItem] = useState<string>("todo");
 
@@ -378,6 +379,7 @@ export default function App() {
   const handleAddItemFromColumn = (columnId: string) => {
     setDefaultColumnForNewItem(columnId);
     setActiveItem(undefined);
+    setIsModalReadOnly(false);
     setIsModalOpen(true);
   };
 
@@ -773,10 +775,11 @@ export default function App() {
             <button
               id="btn-global-add-ticket"
               onClick={() => {
-                setActiveItem(undefined);
-                setDefaultColumnForNewItem("backlog");
-                setIsModalOpen(true);
-              }}
+            setActiveItem(undefined);
+            setDefaultColumnForNewItem("backlog");
+            setIsModalReadOnly(false);
+            setIsModalOpen(true);
+          }}
               className="flex-1 md:flex-initial px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] md:text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm border-0"
             >
               <Plus className="w-3.5 md:w-4 h-3.5 md:h-4" />
@@ -949,6 +952,7 @@ export default function App() {
                 const found = items.find((i) => i.id === id);
                 if (found) {
                   setActiveItem(found);
+                  setIsModalReadOnly(true);
                   setIsModalOpen(true);
                 }
               }}
@@ -1002,9 +1006,12 @@ export default function App() {
           assignees={assignees}
           columns={columns.map(c => ({ id: c.id, title: c.title }))}
           defaultColumnId={activeItem ? undefined : defaultColumnForNewItem}
+          isReadOnly={isModalReadOnly}
+          onEdit={() => setIsModalReadOnly(false)}
           onClose={() => {
             setIsModalOpen(false);
             setActiveItem(undefined);
+            setIsModalReadOnly(false);
           }}
           onSave={handleSaveItem}
           onDelete={activeItem ? handleDeleteItem : undefined}
