@@ -120,6 +120,7 @@ export default function ItemModal({
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
   const [newComment, setNewComment] = useState("");
   const [showTagCreator, setShowTagCreator] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Toggle custom tags
   const handleToggleTag = (tagId: string) => {
@@ -291,6 +292,20 @@ export default function ItemModal({
             />
           </div>
 
+          {/* Large Preview for View Mode */}
+          {isReadOnly && images.length > 0 && (
+            <div 
+              className="w-full aspect-[2/1] md:aspect-[3/1] rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 cursor-zoom-in"
+              onClick={() => setSelectedImage(images[0])}
+            >
+              <img 
+                src={images[0]} 
+                alt="Primary attachment" 
+                className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500"
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Left side parameters (Type, Priority, Column, Assignee, Points, Due Date) */}
@@ -349,8 +364,12 @@ export default function ItemModal({
                 {images.length > 0 && (
                   <div className={`grid grid-cols-4 gap-2 font-mono ${!isReadOnly ? "mt-2" : ""}`}>
                     {images.map((img, idx) => (
-                      <div key={idx} className="relative group/img aspect-video rounded-lg overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-sm">
-                        <img src={img} alt="Attachment thumbnail" className="w-full h-full object-cover" />
+                      <div 
+                        key={idx} 
+                        className="relative group/img aspect-video rounded-lg overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-sm cursor-zoom-in"
+                        onClick={() => setSelectedImage(img)}
+                      >
+                        <img src={img} alt="Attachment thumbnail" className="w-full h-full object-cover hover:scale-105 transition-transform duration-200" />
                         {!isReadOnly && (
                           <button
                             type="button"
@@ -665,6 +684,27 @@ export default function ItemModal({
           </div>
 
         </form>
+
+        {/* Full Image Lightbox Overlay */}
+        {selectedImage && (
+          <div 
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button 
+              className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors cursor-pointer"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={selectedImage} 
+              alt="Full size attachment" 
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
 
         {/* Footer actions */}
         <div className="px-4 md:px-6 py-4 bg-slate-50/50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
