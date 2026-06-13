@@ -347,7 +347,7 @@ export default function ItemModal({
 
                 {/* Thumbnail Preview Area */}
                 {images.length > 0 && (
-                  <div className="grid grid-cols-4 gap-2 mt-2 font-mono">
+                  <div className={`grid grid-cols-4 gap-2 font-mono ${!isReadOnly ? "mt-2" : ""}`}>
                     {images.map((img, idx) => (
                       <div key={idx} className="relative group/img aspect-video rounded-lg overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-sm">
                         <img src={img} alt="Attachment thumbnail" className="w-full h-full object-cover" />
