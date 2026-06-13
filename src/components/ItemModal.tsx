@@ -111,6 +111,19 @@ export default function ItemModal({
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    if (isReadOnly) return;
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          processFile(file);
+        }
+      }
+    }
+  };
+
   const removeImage = (indexToRemove: number) => {
     setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
     logActivity(`Deleted an image attachment`);
@@ -273,7 +286,11 @@ export default function ItemModal({
         </div>
 
         {/* Form Body - Scrollable */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 md:space-y-6">
+        <form 
+          onSubmit={handleSubmit} 
+          onPaste={handlePaste}
+          className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 md:space-y-6"
+        >
           
           {/* Main Title Input */}
           <div className="space-y-1.5">
@@ -355,7 +372,7 @@ export default function ItemModal({
                       className="hidden" 
                     />
                     <Upload className="w-6 h-6 text-slate-400 dark:text-slate-500 mb-1.5" />
-                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Drag & drop images here, or <span className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">browse</span></span>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Drag & drop images here, paste from clipboard, or <span className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">browse</span></span>
                     <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Lightweight optimised snapshots (JPG, PNG, GIF)</span>
                   </div>
                 )}
