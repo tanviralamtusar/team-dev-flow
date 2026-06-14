@@ -162,14 +162,19 @@ export default function ItemModal({
 
   // Toggle subtask status
   const handleToggleSubtask = (id: string) => {
-    setSubtasks(subtasks.map(sub => {
+    const updatedSubtasks = subtasks.map(sub => {
       if (sub.id === id) {
         const nextState = !sub.completed;
         logActivity(`${nextState ? 'Completed' : 'Reopened'} subtask "${sub.title}"`);
         return { ...sub, completed: nextState };
       }
       return sub;
-    }));
+    });
+    setSubtasks(updatedSubtasks);
+
+    if (isReadOnly && item) {
+      onSave({ ...item, subtasks: updatedSubtasks });
+    }
   };
 
   // Delete subtask
@@ -487,12 +492,11 @@ export default function ItemModal({
                         className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 transition-all duration-150 shadow-xs"
                       >
                         <label className="flex items-center gap-2.5 cursor-pointer min-w-0 flex-1">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={sub.completed}
-                            disabled={isReadOnly}
                             onChange={() => handleToggleSubtask(sub.id)}
-                            className="w-4 h-4 rounded text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 focus:ring-indigo-500 outline-none disabled:opacity-50"
+                            className="w-4 h-4 rounded text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 focus:ring-indigo-500 outline-none"
                           />
                           <span className={`text-xs text-slate-700 dark:text-slate-300 truncate font-semibold font-mono ${sub.completed ? "line-through text-slate-400 dark:text-slate-600 decoration-slate-400 dark:decoration-slate-600" : ""}`}>
                             {sub.title}
