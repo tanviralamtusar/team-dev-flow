@@ -47,17 +47,23 @@ export default function StatsView({ items, columns, assignees, onSelectFilter }:
   const assigneeWorkload = assignees.map((assignee) => {
     const assignedItems = items.filter((i) => i.assigneeId === assignee.id);
     const unresolvedItems = assignedItems.filter((i) => i.status !== "done");
-    const totalStoryPoints = assignedItems.reduce((acc, current) => acc + (current.storyPoints || 0), 0);
+    
+    // Workload should be based on unresolved items that actually need work
+    const workloadPoints = unresolvedItems.reduce((acc, current) => acc + (current.storyPoints || 0), 0);
+    
     return {
       assignee,
       count: assignedItems.length,
       unresolved: unresolvedItems.length,
-      points: totalStoryPoints,
+      points: workloadPoints,
     };
   });
 
-  // Calculate workloads
-  const maxPoints = Math.max(...assigneeWorkload.map((w) => w.points), 1);
+  // Calculate workloads - fallback to item count if no points are assigned anywhere
+  const hasWorkloadPoints = assigneeWorkload.some(w => w.points > 0);
+  const maxWorkload = hasWorkloadPoints 
+    ? Math.max(...assigneeWorkload.map((w) => w.points), 1)
+    : Math.max(...assigneeWorkload.map((w) => w.unresolved), 1);
 
   // Status distribution percentages
   const statusValues = columns.map(col => {
@@ -312,7 +318,8 @@ export default function StatsView({ items, columns, assignees, onSelectFilter }:
 
             <div className="space-y-4 flex-1">
               {assigneeWorkload.map(({ assignee, count, unresolved, points }) => {
-                const percentPoints = Math.round((points / maxPoints) * 100);
+                const loadValue = hasWorkloadPoints ? points : unresolved;
+                const percentPoints = Math.round((loadValue / maxWorkload) * 100);
 
                 return (
                   <div 

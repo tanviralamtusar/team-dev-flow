@@ -58,7 +58,7 @@ export default function TeammatesView({
 
       const newMember: Assignee = {
         id: existingProfile ? existingProfile.id : `dev-${Date.now()}`,
-        name: existingProfile?.username || email.trim().split('@')[0],
+        name: existingProfile?.displayName || email.trim().split('@')[0],
         avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
         role: role.trim() || (existingProfile?.role) || "Developer",
         email: email.trim(),
