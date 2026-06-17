@@ -338,7 +338,7 @@ export default function StatsView({ items, columns, assignees, onSelectFilter }:
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block font-mono">{points} PTS</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block font-mono">{loadValue} PTS</span>
                         <span className="text-[9px] text-slate-400 dark:text-slate-500 block font-mono font-semibold">{unresolved} open items</span>
                       </div>
                     </div>
