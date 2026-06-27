@@ -79,9 +79,17 @@ router.post("/:id/heartbeat", (req: AuthRequest, res: Response) => {
   if (!activeUsers[projectId]) {
     activeUsers[projectId] = {};
   }
-  
+
   const now = Date.now();
   activeUsers[projectId][userId] = now;
+
+  // Persist a durable "check-in" so we can show when a user last visited,
+  // even after they've gone offline.
+  db.prepare(`
+    INSERT INTO check_ins (projectId, userId, lastSeen)
+    VALUES (?, ?, ?)
+    ON CONFLICT(projectId, userId) DO UPDATE SET lastSeen = excluded.lastSeen
+  `).run(projectId, userId, new Date(now).toISOString());
 
   // Cleanup old users and count active (e.g. seen in last 30 seconds)
   let activeCount = 0;
@@ -94,6 +102,23 @@ router.post("/:id/heartbeat", (req: AuthRequest, res: Response) => {
   }
 
   res.json({ activeCount });
+});
+
+// GET /api/projects/:id/checkins — when each member last visited the project
+router.get("/:id/checkins", (req: AuthRequest, res: Response) => {
+  try {
+    const projectId = req.params.id;
+    const rows = db.prepare(`
+      SELECT c.userId, c.lastSeen, p.displayName, p.email, p.avatarUrl
+      FROM check_ins c
+      LEFT JOIN profiles p ON p.id = c.userId
+      WHERE c.projectId = ?
+      ORDER BY c.lastSeen DESC
+    `).all(projectId);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch check-ins" });
+  }
 });
 
 export default router;

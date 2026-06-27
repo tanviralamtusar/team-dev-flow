@@ -97,6 +97,16 @@ db.exec(`
     email     TEXT UNIQUE NOT NULL,
     createdAt TEXT NOT NULL
   );
+
+  -- Persistent "check-in" / last-seen tracking per user per project
+  CREATE TABLE IF NOT EXISTS check_ins (
+    projectId TEXT NOT NULL,
+    userId    TEXT NOT NULL,
+    lastSeen  TEXT NOT NULL,
+    PRIMARY KEY (projectId, userId),
+    FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  );
 `);
 
 export default db;

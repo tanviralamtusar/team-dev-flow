@@ -160,6 +160,17 @@ export const createProject = (name: string) =>
 export const sendHeartbeat = (projectId: string) =>
   request<{ activeCount: number }>(`/projects/${projectId}/heartbeat`, json("POST", {}));
 
+export interface CheckIn {
+  userId: string;
+  lastSeen: string;
+  displayName?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+}
+
+export const getCheckIns = (projectId: string) =>
+  request<CheckIn[]>(`/projects/${projectId}/checkins`);
+
 // ── Invitations ───────────────────────────────────────────────────────────────
 export const getInvitations = () => request<Invitation[]>("/invitations");
 

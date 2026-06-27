@@ -1,15 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Assignee } from "../types";
-import { 
-  Users, 
-  Plus, 
-  Trash, 
-  Briefcase, 
-  Mail, 
-  RefreshCw
+import {
+  Users,
+  Plus,
+  Trash,
+  Briefcase,
+  Mail,
+  RefreshCw,
+  Clock
 } from "lucide-react";
 
 import * as api from "../api";
+import type { CheckIn } from "../api";
+
+// Format an ISO timestamp into a short "last seen" relative string.
+function formatRelativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return "—";
+  const diffMs = Date.now() - then;
+  const sec = Math.floor(diffMs / 1000);
+  if (sec < 45) return "just now";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const days = Math.floor(hr / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+// "Online" if the user has checked in within the last 30 seconds.
+const isOnline = (iso: string) => Date.now() - new Date(iso).getTime() < 30000;
 
 interface TeammatesViewProps {
   projectId: string;
@@ -38,6 +59,30 @@ export default function TeammatesView({
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check-in (last-seen) activity for project members
+  const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
+
+  useEffect(() => {
+    if (!projectId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const data = await api.getCheckIns(projectId);
+        if (!cancelled) setCheckIns(data);
+      } catch (err) {
+        console.warn("Failed to load check-ins:", err);
+      }
+    };
+
+    load();
+    const interval = setInterval(load, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [projectId]);
 
   // Handler: Add & Invite Teammate
   const handleAddTeammate = async (e: React.FormEvent) => {
@@ -187,6 +232,74 @@ export default function TeammatesView({
             Adding a teammate will send an invitation and include them in the project roster for ticket assignments.
           </p>
         </form>
+      </div>
+
+      {/* Check-In Activity — when each member last visited the project */}
+      <div className="bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-slate-800 p-6 rounded-2xl space-y-4 shadow-xs">
+        <div>
+          <h3 className="text-sm font-display font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+            <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            Check-In Activity
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            See when each member last opened the board.
+          </p>
+        </div>
+
+        {checkIns.length === 0 ? (
+          <p className="text-xs text-slate-400 dark:text-slate-500 italic text-center py-6">
+            No check-ins recorded yet.
+          </p>
+        ) : (
+          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+            {checkIns.map((c) => {
+              const online = isOnline(c.lastSeen);
+              const name =
+                c.displayName ||
+                assignees.find((a) => a.id === c.userId || a.email === c.email)?.name ||
+                c.email ||
+                "Unknown member";
+              return (
+                <div
+                  key={c.userId}
+                  className="flex items-center justify-between p-3 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/40"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      {online && (
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      )}
+                      <span
+                        className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                          online ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+                        }`}
+                      />
+                    </span>
+                    <div className="min-w-0">
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">
+                        {name}
+                      </span>
+                      {c.email && (
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate block">
+                          {c.email}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span
+                    className={`text-[10px] font-mono font-semibold uppercase shrink-0 ${
+                      online
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-slate-400 dark:text-slate-500"
+                    }`}
+                  >
+                    {online ? "Online" : formatRelativeTime(c.lastSeen)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
