@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Excalidraw, MainMenu, WelcomeScreen, exportToBlob, getSceneVersion, serializeAsJSON } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI, BinaryFiles, AppState } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -18,6 +18,8 @@ import {
   ImageDown,
   Clock,
   FolderKanban,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 interface CanvasViewProps {
@@ -29,6 +31,9 @@ interface CanvasViewProps {
 type SaveState = "idle" | "dirty" | "saving" | "saved" | "error";
 
 const AUTOSAVE_DELAY_MS = 1500;
+const MIN_SURFACE_HEIGHT = 420;
+/** Breathing room between the drawing surface and whatever sits under it. */
+const SURFACE_BOTTOM_GAP = 24;
 
 /** Per-user viewport (scroll + zoom) is local preference, not shared scene data. */
 const viewportKey = (canvasId: string) => `devflow_canvas_viewport_${canvasId}`;
@@ -74,6 +79,9 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
   const [error, setError] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [surfaceHeight, setSurfaceHeight] = useState<number>(MIN_SURFACE_HEIGHT);
+  const surfaceRef = useRef<HTMLDivElement>(null);
 
   const excalidrawApiRef = useRef<ExcalidrawImperativeAPI | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -212,6 +220,39 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
     return () => window.removeEventListener("beforeunload", flush);
   }, [persistScene]);
 
+  // ── Sizing ─────────────────────────────────────────────────────────────────
+  // Excalidraw needs a definite pixel height. Rather than hard-coding an offset
+  // for the header/nav/footer chrome, measure where the surface actually starts
+  // and stretch it to the footer — that stays correct if the chrome changes.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const el = surfaceRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const footerHeight = isExpanded
+        ? 0
+        : document.querySelector("#devflow-root > footer")?.getBoundingClientRect().height ?? 0;
+      const available = window.innerHeight - top - footerHeight - SURFACE_BOTTOM_GAP;
+      setSurfaceHeight(Math.max(MIN_SURFACE_HEIGHT, Math.round(available)));
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    // The error banner and rail can reflow the surface without a window resize.
+    const observer = new ResizeObserver(measure);
+    if (surfaceRef.current?.parentElement) observer.observe(surfaceRef.current.parentElement);
+    return () => {
+      window.removeEventListener("resize", measure);
+      observer.disconnect();
+    };
+  }, [isExpanded, activeId, error]);
+
+  // Excalidraw reads its canvas size from the container, so it has to be told
+  // when the fullscreen toggle changes that container's box.
+  useEffect(() => {
+    excalidrawApiRef.current?.refresh();
+  }, [surfaceHeight, isExpanded]);
+
   // ── Board management ───────────────────────────────────────────────────────
   const handleCreate = async () => {
     const name = prompt("Name this canvas:", `Sketch ${canvases.length + 1}`);
@@ -289,6 +330,9 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
       appState: {
         ...(activeCanvas.scene.appState ?? {}),
         ...readViewport(activeCanvas.id),
+        // The `theme` prop is only synced on update, never on mount — without
+        // this a canvas opened while the app is already dark renders light.
+        theme: isDarkMode ? "dark" : "light",
         // Rehydrated from JSON, so anything Excalidraw expects as a live
         // structure (collaborators is a Map) must not be carried over.
         collaborators: undefined,
@@ -296,6 +340,9 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
       files: activeCanvas.scene.files ?? {},
       scrollToContent: true,
     };
+    // isDarkMode is deliberately excluded: remounting on every theme toggle
+    // would discard undo history. The `theme` prop handles live toggles.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCanvas]);
 
   const statusPill = () => {
@@ -325,9 +372,19 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-full">
-      {/* Canvas list rail */}
-      <aside className="lg:w-64 shrink-0 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] rounded-2xl p-3 flex flex-col">
+    <div
+      className={
+        isExpanded
+          ? "fixed inset-0 z-50 p-3 bg-slate-50 dark:bg-[#0b0f1a] flex"
+          : "flex flex-col lg:flex-row gap-4 h-full"
+      }
+    >
+      {/* Canvas list rail — hidden in fullscreen to hand the width to the canvas */}
+      <aside
+        className={`lg:w-64 shrink-0 bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] rounded-2xl p-3 flex-col ${
+          isExpanded ? "hidden" : "flex"
+        }`}
+      >
         <div className="flex items-center justify-between px-1 pb-3 mb-2 border-b border-slate-50 dark:border-slate-800/60">
           <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono uppercase tracking-widest flex items-center gap-1.5">
             <PenTool className="w-3 h-3" />
@@ -451,6 +508,15 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
                 PNG
               </button>
             )}
+            {activeCanvas && (
+              <button
+                onClick={() => setIsExpanded((v) => !v)}
+                title={isExpanded ? "Exit fullscreen" : "Fullscreen canvas"}
+                className="w-7 h-7 flex items-center justify-center bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white rounded-lg transition-all cursor-pointer"
+              >
+                {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+              </button>
+            )}
           </div>
         </div>
 
@@ -462,7 +528,7 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
 
         {/* `select-none` on the app root breaks Excalidraw's text editing, so the
             drawing surface opts back in. */}
-        <div className="flex-1 relative h-[calc(100vh-330px)] min-h-[480px] select-text">
+        <div ref={surfaceRef} style={{ height: surfaceHeight }} className="flex-1 relative select-text">
           {isLoadingScene && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-[#151b2b]/70 backdrop-blur-sm">
               <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
@@ -490,8 +556,13 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
                 <WelcomeScreen.Hints.MenuHint />
                 <WelcomeScreen.Hints.ToolbarHint />
                 <WelcomeScreen.Center>
+                  {/* The logo slot is what pushes the heading clear of the
+                      toolbar hint — without it the two texts overlap. */}
+                  <WelcomeScreen.Center.Logo>
+                    <PenTool className="w-8 h-8" />
+                  </WelcomeScreen.Center.Logo>
                   <WelcomeScreen.Center.Heading>
-                    Sketch the architecture. It autosaves to the project.
+                    Autosaves to the project.
                   </WelcomeScreen.Center.Heading>
                   <WelcomeScreen.Center.Menu>
                     <WelcomeScreen.Center.MenuItemLoadScene />
