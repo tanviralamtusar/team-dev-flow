@@ -93,3 +93,21 @@ export interface Invitation {
   status: 'pending' | 'accepted' | 'declined';
   createdAt: string;
 }
+
+/** Metadata for an Excalidraw whiteboard belonging to a project. */
+export interface CanvasMeta {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy?: string | null;
+}
+
+/** A whiteboard plus its serialized Excalidraw scene. */
+export interface Canvas extends CanvasMeta {
+  scene: {
+    elements: readonly any[];
+    appState: Record<string, any>;
+    files: Record<string, any>;
+  };
+}

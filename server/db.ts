@@ -98,6 +98,20 @@ db.exec(`
     createdAt TEXT NOT NULL
   );
 
+  -- Excalidraw whiteboards — one row per canvas, scoped to a project
+  CREATE TABLE IF NOT EXISTS canvases (
+    id        TEXT PRIMARY KEY,
+    projectId TEXT NOT NULL,
+    name      TEXT NOT NULL,
+    data      TEXT NOT NULL,
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL,
+    updatedBy TEXT,
+    FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_canvases_project ON canvases(projectId);
+
   -- Persistent "check-in" / last-seen tracking per user per project
   CREATE TABLE IF NOT EXISTS check_ins (
     projectId TEXT NOT NULL,

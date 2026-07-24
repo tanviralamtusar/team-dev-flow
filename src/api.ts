@@ -3,7 +3,11 @@
  * Typed REST API client for the SQLite/Express backend.
  * All functions mirror the Firebase operations previously in App.tsx.
  */
-import { BoardItem, Column, Tag, Assignee, Profile, Project, Invitation } from "./types";
+import { BoardItem, Column, Tag, Assignee, Profile, Project, Invitation, Canvas, CanvasMeta } from "./types";
+
+// Endpoints that are scoped to the active project and need projectId injected.
+const PROJECT_SCOPED = ["/items", "/columns", "/tags", "/assignees", "/canvases"];
+const isProjectScoped = (url: string) => PROJECT_SCOPED.some((p) => url.startsWith(p));
 
 const BASE = "/api";
 
@@ -36,7 +40,7 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   }
 
   let finalUrl = `${BASE}${url}`;
-  if (currentProjectId && (url.startsWith("/items") || url.startsWith("/columns") || url.startsWith("/tags") || url.startsWith("/assignees"))) {
+  if (currentProjectId && isProjectScoped(url)) {
     const separator = finalUrl.includes("?") ? "&" : "?";
     finalUrl += `${separator}projectId=${currentProjectId}`;
     
@@ -48,7 +52,7 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
         // Not JSON or no body
       }
     }
-  } else if (!currentProjectId && (url.startsWith("/items") || url.startsWith("/columns") || url.startsWith("/tags") || url.startsWith("/assignees"))) {
+  } else if (!currentProjectId && isProjectScoped(url)) {
     // If no project selected but trying to access project resources, we might want to handle it
     // For now, let it fail or handle in App.tsx
   }
@@ -139,6 +143,23 @@ export const updateAssignees = (assignees: Assignee[]) =>
 
 export const deleteAssignee = (id: string) =>
   request<{ success: boolean }>(`/assignees/${id}`, { method: "DELETE" });
+
+// ── Canvases (Excalidraw whiteboards) ────────────────────────────────────────
+export const getCanvases = () => request<CanvasMeta[]>("/canvases");
+
+export const getCanvas = (id: string) => request<Canvas>(`/canvases/${id}`);
+
+export const createCanvas = (name: string) =>
+  request<CanvasMeta>("/canvases", json("POST", { name }));
+
+export const saveCanvasScene = (id: string, scene: Canvas["scene"]) =>
+  request<CanvasMeta>(`/canvases/${id}`, json("PUT", { scene }));
+
+export const renameCanvas = (id: string, name: string) =>
+  request<CanvasMeta>(`/canvases/${id}`, json("PUT", { name }));
+
+export const deleteCanvas = (id: string) =>
+  request<{ success: boolean }>(`/canvases/${id}`, { method: "DELETE" });
 
 // ── Profiles ─────────────────────────────────────────────────────────────────
 export const getProfile = (id: string) => request<Profile>(`/profiles/${id}`);
