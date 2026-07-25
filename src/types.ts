@@ -111,3 +111,20 @@ export interface Canvas extends CanvasMeta {
     files: Record<string, any>;
   };
 }
+
+/** Listing entry for a rich-text note belonging to a project. */
+export interface NoteMeta {
+  id: string;
+  title: string;
+  /** Plain-text preview of the body, generated server-side. */
+  excerpt: string;
+  pinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy?: string | null;
+}
+
+/** A note plus its HTML body. */
+export interface Note extends NoteMeta {
+  content: string;
+}

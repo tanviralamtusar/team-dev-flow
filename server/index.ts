@@ -15,6 +15,7 @@ import tagsRouter from "./routes/tags.js";
 import assigneesRouter from "./routes/assignees.js";
 import profilesRouter from "./routes/profiles.js";
 import canvasesRouter from "./routes/canvases.js";
+import notesRouter from "./routes/notes.js";
 import { authenticateToken } from "./middleware/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -42,6 +43,7 @@ app.use("/api/tags", authenticateToken, tagsRouter);
 app.use("/api/assignees", authenticateToken, assigneesRouter);
 app.use("/api/profiles", authenticateToken, profilesRouter);
 app.use("/api/canvases", authenticateToken, canvasesRouter);
+app.use("/api/notes", authenticateToken, notesRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {

@@ -112,6 +112,22 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_canvases_project ON canvases(projectId);
 
+  -- Rich-text documents — one row per note, scoped to a project
+  CREATE TABLE IF NOT EXISTS notes (
+    id        TEXT PRIMARY KEY,
+    projectId TEXT NOT NULL,
+    title     TEXT NOT NULL,
+    content   TEXT NOT NULL,               -- sanitized HTML
+    excerpt   TEXT NOT NULL DEFAULT '',    -- plain-text preview for the list rail
+    pinned    INTEGER NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL,
+    updatedBy TEXT,
+    FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_notes_project ON notes(projectId);
+
   -- Persistent "check-in" / last-seen tracking per user per project
   CREATE TABLE IF NOT EXISTS check_ins (
     projectId TEXT NOT NULL,

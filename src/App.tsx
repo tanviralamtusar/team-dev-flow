@@ -12,6 +12,7 @@ import TeammatesView from "./components/TeammatesView";
 import SettingsView from "./components/SettingsView";
 // Excalidraw is a large dependency — keep it out of the initial board bundle.
 const CanvasView = lazy(() => import("./components/CanvasView"));
+const NotesView = lazy(() => import("./components/NotesView"));
 import ItemModal from "./components/ItemModal";
 import Auth from "./components/Auth";
 import { 
@@ -47,7 +48,8 @@ import {
   Check,
   X,
   Users,
-  PenTool
+  PenTool,
+  FileText
 } from "lucide-react";
 
 // REST API client (SQLite backend)
@@ -237,7 +239,7 @@ export default function App() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Active View Tab: 'board' | 'stats' | 'teammates' | 'settings'
-  const [activeTab, setActiveTab] = useState<"board" | "canvas" | "stats" | "teammates" | "settings">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "canvas" | "notes" | "stats" | "teammates" | "settings">("board");
 
   // --- Filtering States ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -718,6 +720,7 @@ export default function App() {
             {[
               { id: "board", label: "Board", icon: <Layers className="w-3.5 h-3.5" /> },
               { id: "canvas", label: "Canvas", icon: <PenTool className="w-3.5 h-3.5" /> },
+              { id: "notes", label: "Notes", icon: <FileText className="w-3.5 h-3.5" /> },
               { id: "stats", label: "Stats", icon: <TrendingUp className="w-3.5 h-3.5" /> },
               { id: "teammates", label: "Teammates", icon: <Users className="w-3.5 h-3.5" /> },
               { id: "settings", label: "Setup", icon: <Settings className="w-3.5 h-3.5" /> },
@@ -980,6 +983,21 @@ export default function App() {
               <CanvasView
                 projectId={activeProject?.id || ""}
                 isDarkMode={isDarkMode}
+                currentUser={user?.username || "Unknown"}
+              />
+            </Suspense>
+          )}
+
+          {activeTab === "notes" && (
+            <Suspense
+              fallback={
+                <div className="h-[60vh] flex items-center justify-center bg-white dark:bg-[#151b2b] border border-slate-100 dark:border-[#262f45] rounded-2xl">
+                  <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
+                </div>
+              }
+            >
+              <NotesView
+                projectId={activeProject?.id || ""}
                 currentUser={user?.username || "Unknown"}
               />
             </Suspense>

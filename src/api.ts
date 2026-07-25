@@ -3,10 +3,10 @@
  * Typed REST API client for the SQLite/Express backend.
  * All functions mirror the Firebase operations previously in App.tsx.
  */
-import { BoardItem, Column, Tag, Assignee, Profile, Project, Invitation, Canvas, CanvasMeta } from "./types";
+import { BoardItem, Column, Tag, Assignee, Profile, Project, Invitation, Canvas, CanvasMeta, Note, NoteMeta } from "./types";
 
 // Endpoints that are scoped to the active project and need projectId injected.
-const PROJECT_SCOPED = ["/items", "/columns", "/tags", "/assignees", "/canvases"];
+const PROJECT_SCOPED = ["/items", "/columns", "/tags", "/assignees", "/canvases", "/notes"];
 const isProjectScoped = (url: string) => PROJECT_SCOPED.some((p) => url.startsWith(p));
 
 const BASE = "/api";
@@ -160,6 +160,26 @@ export const renameCanvas = (id: string, name: string) =>
 
 export const deleteCanvas = (id: string) =>
   request<{ success: boolean }>(`/canvases/${id}`, { method: "DELETE" });
+
+// ── Notes (rich-text documents) ──────────────────────────────────────────────
+export const getNotes = () => request<NoteMeta[]>("/notes");
+
+export const getNote = (id: string) => request<Note>(`/notes/${id}`);
+
+export const createNote = (title: string, content = "") =>
+  request<NoteMeta>("/notes", json("POST", { title, content }));
+
+export const saveNoteContent = (id: string, content: string) =>
+  request<NoteMeta>(`/notes/${id}`, json("PUT", { content }));
+
+export const renameNote = (id: string, title: string) =>
+  request<NoteMeta>(`/notes/${id}`, json("PUT", { title }));
+
+export const setNotePinned = (id: string, pinned: boolean) =>
+  request<NoteMeta>(`/notes/${id}`, json("PUT", { pinned }));
+
+export const deleteNote = (id: string) =>
+  request<{ success: boolean }>(`/notes/${id}`, { method: "DELETE" });
 
 // ── Profiles ─────────────────────────────────────────────────────────────────
 export const getProfile = (id: string) => request<Profile>(`/profiles/${id}`);
