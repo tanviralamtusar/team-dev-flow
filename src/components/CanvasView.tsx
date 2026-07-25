@@ -528,7 +528,7 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
 
         {/* `select-none` on the app root breaks Excalidraw's text editing, so the
             drawing surface opts back in. */}
-        <div ref={surfaceRef} style={{ height: surfaceHeight }} className="flex-1 relative select-text">
+        <div ref={surfaceRef} style={{ height: surfaceHeight }} className="relative w-full select-text">
           {isLoadingScene && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-[#151b2b]/70 backdrop-blur-sm">
               <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
