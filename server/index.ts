@@ -3,7 +3,8 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { seedDatabase } from "./seed.js";
+// Importing the db module opens the database and runs schema setup + migrations.
+import "./db.js";
 
 // Route imports
 import authRouter from "./routes/auth.js";
@@ -60,8 +61,9 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(CLIENT_DIR, "index.html"));
 });
 
-// ── Seed + Start ───────────────────────────────────────────────────────────────
-seedDatabase();
+// ── Start ──────────────────────────────────────────────────────────────────────
+// Board data is seeded per project when a project is created, not globally:
+// columns/tags/assignees rows are meaningless without a projectId.
 
 app.listen(PORT, () => {
   console.log(`🚀 Kanban API server running on http://localhost:${PORT}`);

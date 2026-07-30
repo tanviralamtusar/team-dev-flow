@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Pre-migration database snapshots
+*.db.bak-*
