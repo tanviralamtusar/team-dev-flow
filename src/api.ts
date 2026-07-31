@@ -152,8 +152,10 @@ export const getCanvas = (id: string) => request<Canvas>(`/canvases/${id}`);
 export const createCanvas = (name: string) =>
   request<CanvasMeta>("/canvases", json("POST", { name }));
 
-export const saveCanvasScene = (id: string, scene: Canvas["scene"]) =>
-  request<CanvasMeta>(`/canvases/${id}`, json("PUT", { scene }));
+// `keepalive` lets a save started while the page is unloading outlive the
+// document — a normal fetch is cancelled the moment the tab goes away.
+export const saveCanvasScene = (id: string, scene: Canvas["scene"], keepalive = false) =>
+  request<CanvasMeta>(`/canvases/${id}`, { ...json("PUT", { scene }), keepalive });
 
 export const renameCanvas = (id: string, name: string) =>
   request<CanvasMeta>(`/canvases/${id}`, json("PUT", { name }));

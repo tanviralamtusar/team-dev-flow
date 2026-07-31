@@ -31,6 +31,11 @@ interface CanvasViewProps {
 type SaveState = "idle" | "dirty" | "saving" | "saved" | "error";
 
 const AUTOSAVE_DELAY_MS = 1500;
+/** Backoff before retrying a failed save, so a blip doesn't strand the edit. */
+const SAVE_RETRY_DELAY_MS = 5000;
+const MAX_SAVE_RETRIES = 3;
+/** onChange fires per pointer frame; the viewport only needs an occasional write. */
+const VIEWPORT_WRITE_DELAY_MS = 400;
 const MIN_SURFACE_HEIGHT = 420;
 /** Breathing room between the drawing surface and whatever sits under it. */
 const SURFACE_BOTTOM_GAP = 24;
@@ -89,6 +94,16 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
   // high-frequency onChange stream (it fires on pure pointer/selection moves too).
   const savedVersionRef = useRef<number>(-1);
   const activeIdRef = useRef<string | null>(null);
+  const isSavingRef = useRef(false);
+  const pendingSaveRef = useRef(false);
+  const retriesRef = useRef(0);
+  // Late-bound so the debounce timer can call the current persist function
+  // without either callback having to depend on the other.
+  const persistRef = useRef<() => void>(() => {});
+  // Boards deleted in this session must never be flushed back to the server.
+  const deletedIdsRef = useRef<Set<string>>(new Set());
+  const viewportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const viewportStateRef = useRef<{ id: string; appState: AppState } | null>(null);
 
   useEffect(() => {
     activeIdRef.current = activeId;
@@ -137,6 +152,8 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
         if (cancelled) return;
         setActiveCanvas(canvas);
         savedVersionRef.current = getSceneVersion((canvas.scene.elements ?? []) as ExcalidrawElement[]);
+        retriesRef.current = 0;
+        pendingSaveRef.current = false;
         setSaveState("idle");
         setError(null);
       })
@@ -152,33 +169,107 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
   }, [activeId]);
 
   // ── Saving ─────────────────────────────────────────────────────────────────
-  const persistScene = useCallback(async () => {
+  /**
+   * Snapshot of the live scene in the shape the API stores, or null when there
+   * is nothing new to write.
+   */
+  const readScene = useCallback(() => {
     const excalidrawApi = excalidrawApiRef.current;
     const canvasId = activeIdRef.current;
-    if (!excalidrawApi || !canvasId) return;
+    if (!excalidrawApi || !canvasId || deletedIdsRef.current.has(canvasId)) return null;
 
-    const elements = excalidrawApi.getSceneElements();
-    const appState = excalidrawApi.getAppState();
-    const files = excalidrawApi.getFiles();
-
-    // serializeAsJSON strips deleted elements and transient UI state, producing
-    // the same portable payload as a .excalidraw file.
-    const scene = JSON.parse(serializeAsJSON(elements, appState, files, "database"));
+    // onChange reports deleted elements too, so the version marker has to be
+    // measured over that same array — taking it over the pruned list instead
+    // leaves the two permanently unequal after the first deletion, and every
+    // subsequent onChange then looks like an unsaved edit.
+    const elements = excalidrawApi.getSceneElementsIncludingDeleted();
     const version = getSceneVersion(elements);
+    if (version === savedVersionRef.current) return null;
 
-    setSaveState("saving");
-    try {
-      const meta = await api.saveCanvasScene(canvasId, {
+    const files = excalidrawApi.getFiles();
+    // serializeAsJSON strips deleted elements and transient UI state, producing
+    // the same portable payload as a .excalidraw file. It deliberately omits
+    // the files map for "database", so that is re-attached here — minus the
+    // assets no surviving element references.
+    const scene = JSON.parse(serializeAsJSON(elements, excalidrawApi.getAppState(), files, "database"));
+    const usedFiles: BinaryFiles = {};
+    for (const element of (scene.elements ?? []) as ExcalidrawElement[]) {
+      const fileId = (element as { fileId?: string }).fileId;
+      if (fileId && files[fileId]) usedFiles[fileId] = files[fileId];
+    }
+
+    return {
+      canvasId,
+      version,
+      payload: {
         elements: scene.elements ?? [],
         appState: scene.appState ?? {},
-        files: scene.files ?? files ?? {},
-      });
-      savedVersionRef.current = version;
-      setSaveState("saved");
-      setCanvases((prev) => prev.map((c) => (c.id === meta.id ? { ...c, ...meta } : c)));
-    } catch {
-      setSaveState("error");
+        files: usedFiles,
+      },
+    };
+  }, []);
+
+  const scheduleSave = useCallback((delay: number) => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      persistRef.current();
+    }, delay);
+  }, []);
+
+  const persistScene = useCallback(async () => {
+    // A second PUT started mid-flight would race the first on both the row and
+    // savedVersionRef; note the work and let the running save pick it up.
+    if (isSavingRef.current) {
+      pendingSaveRef.current = true;
+      return;
     }
+
+    const snapshot = readScene();
+    if (!snapshot) return;
+    const { canvasId, version, payload } = snapshot;
+
+    isSavingRef.current = true;
+    setSaveState("saving");
+    try {
+      const meta = await api.saveCanvasScene(canvasId, payload);
+      retriesRef.current = 0;
+      // The board may have been swapped out while the request was in flight —
+      // the one on screen now owns savedVersionRef and the status pill.
+      if (activeIdRef.current === canvasId) {
+        savedVersionRef.current = version;
+        setSaveState("saved");
+      }
+      setCanvases((prev) => prev.map((c) => (c.id === meta.id ? { ...c, ...meta } : c)));
+      setActiveCanvas((prev) => (prev && prev.id === meta.id ? { ...prev, ...meta } : prev));
+    } catch {
+      if (activeIdRef.current === canvasId) setSaveState("error");
+      if (retriesRef.current < MAX_SAVE_RETRIES) {
+        retriesRef.current += 1;
+        scheduleSave(SAVE_RETRY_DELAY_MS);
+      }
+    } finally {
+      isSavingRef.current = false;
+      if (pendingSaveRef.current) {
+        pendingSaveRef.current = false;
+        scheduleSave(0);
+      }
+    }
+  }, [readScene, scheduleSave]);
+
+  useEffect(() => {
+    persistRef.current = persistScene;
+  }, [persistScene]);
+
+  const queueViewportWrite = useCallback((canvasId: string, appState: AppState) => {
+    viewportStateRef.current = { id: canvasId, appState };
+    if (viewportTimerRef.current) return;
+    viewportTimerRef.current = setTimeout(() => {
+      viewportTimerRef.current = null;
+      const latest = viewportStateRef.current;
+      // A board deleted mid-flight already had its viewport key cleaned up.
+      if (latest && !deletedIdsRef.current.has(latest.id)) writeViewport(latest.id, latest.appState);
+    }, VIEWPORT_WRITE_DELAY_MS);
   }, []);
 
   const handleChange = useCallback(
@@ -186,15 +277,15 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
       const canvasId = activeIdRef.current;
       if (!canvasId) return;
 
-      writeViewport(canvasId, appState);
+      queueViewportWrite(canvasId, appState);
 
       if (getSceneVersion(elements) === savedVersionRef.current) return;
 
+      retriesRef.current = 0;
       setSaveState("dirty");
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      saveTimerRef.current = setTimeout(persistScene, AUTOSAVE_DELAY_MS);
+      scheduleSave(AUTOSAVE_DELAY_MS);
     },
-    [persistScene]
+    [queueViewportWrite, scheduleSave]
   );
 
   // Flush pending edits when the canvas is swapped out or the view unmounts.
@@ -203,22 +294,50 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
         saveTimerRef.current = null;
-        persistScene();
       }
+      if (viewportTimerRef.current) {
+        clearTimeout(viewportTimerRef.current);
+        viewportTimerRef.current = null;
+        const latest = viewportStateRef.current;
+        if (latest && !deletedIdsRef.current.has(latest.id)) writeViewport(latest.id, latest.appState);
+      }
+      // Safe to call unconditionally: it no-ops when the scene already matches
+      // what was last written, and it also covers the case where the previous
+      // attempt failed and no timer is pending.
+      persistScene();
     };
   }, [activeId, persistScene]);
 
+  // Best-effort save when the tab is hidden or closed. The debounced save would
+  // simply be cancelled with the document, so this one goes out immediately and
+  // marked keepalive.
   useEffect(() => {
     const flush = () => {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
         saveTimerRef.current = null;
-        persistScene();
       }
+      const snapshot = readScene();
+      if (!snapshot) return;
+      api
+        .saveCanvasScene(snapshot.canvasId, snapshot.payload, true)
+        .then(() => {
+          // Only on success: if the tab comes back, the pill must not claim a
+          // save that never landed.
+          if (activeIdRef.current === snapshot.canvasId) savedVersionRef.current = snapshot.version;
+        })
+        .catch(() => {});
     };
-    window.addEventListener("beforeunload", flush);
-    return () => window.removeEventListener("beforeunload", flush);
-  }, [persistScene]);
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", flush);
+    };
+  }, [readScene]);
 
   // ── Sizing ─────────────────────────────────────────────────────────────────
   // Excalidraw needs a definite pixel height. Rather than hard-coding an offset
@@ -272,6 +391,8 @@ export default function CanvasView({ projectId, isDarkMode, currentUser }: Canva
     try {
       await api.deleteCanvas(id);
       localStorage.removeItem(viewportKey(id));
+      // Stops the swap-out flush from resurrecting the row as a 404 + retries.
+      deletedIdsRef.current.add(id);
       const remaining = canvases.filter((c) => c.id !== id);
       setCanvases(remaining);
       if (activeId === id) {
