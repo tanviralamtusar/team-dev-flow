@@ -38,9 +38,13 @@ router.get("/", (req: AuthRequest, res: Response) => {
   }
 });
 
-// POST /api/projects - Create a new project
+// POST /api/projects - Create a new project (admin only)
 router.post("/", (req: AuthRequest, res: Response) => {
   try {
+    if (!isUserAdmin(req.user?.userId)) {
+      return res.status(403).json({ error: "Only admins can create projects" });
+    }
+
     const { name } = req.body;
     const userId = req.user?.userId;
 

@@ -598,15 +598,17 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-                  <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50 mt-1">
-                    <button
-                      onClick={handleCreateProject}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all font-semibold"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Create New Project
-                    </button>
-                  </div>
+                  {user?.isAdmin && (
+                    <div className="pt-2 border-t border-slate-50 dark:border-slate-800/50 mt-1">
+                      <button
+                        onClick={handleCreateProject}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all font-semibold"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Create New Project
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -920,8 +922,10 @@ export default function App() {
                 <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">No project selected</p>
                 <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
                   {invitations.length > 0
-                    ? "You have pending invitations — accept one to join a project, or create your own."
-                    : "Create a new project or ask a teammate to invite you."}
+                    ? "You have pending invitations — accept one to join a project."
+                    : user?.isAdmin
+                    ? "Create a new project or ask a teammate to invite you."
+                    : "Ask an admin to create a project or invite you to one."}
                 </p>
               </div>
             </div>
@@ -935,13 +939,15 @@ export default function App() {
                   View Invitations ({invitations.length})
                 </button>
               )}
-              <button
-                onClick={handleCreateProject}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Create Project
-              </button>
+              {user?.isAdmin && (
+                <button
+                  onClick={handleCreateProject}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Create Project
+                </button>
+              )}
             </div>
           </div>
         )}
