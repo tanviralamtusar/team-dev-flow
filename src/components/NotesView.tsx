@@ -168,7 +168,7 @@ const relativeTime = (iso?: string | null) => {
 
 const BLOCK_TAGS = new Set(["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "li"]);
 
-const TEXT_COLORS = ["#0f172a", "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0891b2", "#4f46e5", "#9333ea", "#64748b"];
+const TEXT_COLORS = ["#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0891b2", "#4f46e5", "#9333ea", "#64748b"];
 const HIGHLIGHTS = ["#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8", "#e9d5ff", "#fed7aa", "transparent"];
 
 interface FormatState {
@@ -950,6 +950,24 @@ export default function NotesView({ projectId, currentUser }: NotesViewProps) {
               </ToolButton>
               {openPicker === "color" && (
                 <div className="absolute left-0 top-full mt-1.5 w-40 bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-30 p-2 grid grid-cols-5 gap-1.5">
+                  <button
+                    key="default"
+                    title="Default (matches theme)"
+                    onMouseDown={(e) => e.preventDefault()}
+                    // Reads the theme's own --color-geom-text value at click time rather
+                    // than a hardcoded hex, so it always matches the note body's actual
+                    // default ink (near-white in dark mode, not a fixed dark swatch that
+                    // would be unreadable on the dark background).
+                    onClick={() =>
+                      applyColor(
+                        "foreColor",
+                        getComputedStyle(document.documentElement).getPropertyValue("--color-geom-text").trim()
+                      )
+                    }
+                    className="w-6 h-6 rounded-lg border border-slate-200 dark:border-slate-600 cursor-pointer hover:scale-110 transition-transform bg-geom-text flex items-center justify-center"
+                  >
+                    <RemoveFormatting className="w-3 h-3 text-slate-400" />
+                  </button>
                   {TEXT_COLORS.map((c) => (
                     <button
                       key={c}
