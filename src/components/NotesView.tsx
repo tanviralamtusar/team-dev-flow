@@ -964,7 +964,8 @@ export default function NotesView({ projectId, currentUser }: NotesViewProps) {
                         getComputedStyle(document.documentElement).getPropertyValue("--color-geom-text").trim()
                       )
                     }
-                    className="w-6 h-6 rounded-lg border border-slate-200 dark:border-slate-600 cursor-pointer hover:scale-110 transition-transform bg-geom-text flex items-center justify-center"
+                    style={{ backgroundColor: "var(--color-geom-text)" }}
+                    className="w-6 h-6 rounded-lg border border-slate-200 dark:border-slate-600 cursor-pointer hover:scale-110 transition-transform flex items-center justify-center"
                   >
                     <RemoveFormatting className="w-3 h-3 text-slate-400" />
                   </button>
