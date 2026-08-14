@@ -57,7 +57,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     res.status(201).json({
       token,
-      user: { id: userId, username, email }
+      user: { id: userId, username, email, isAdmin: false }
     });
   } catch (error) {
     console.error("Signup error:", error);
@@ -100,7 +100,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
     res.json({
       token,
-      user: { id: user.id, username: user.username, email: user.email }
+      user: { id: user.id, username: user.username, email: user.email, isAdmin: !!user.isAdmin }
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -117,11 +117,11 @@ router.get("/me", (req: Request, res: Response) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    const user = db.prepare("SELECT id, username, email, createdAt FROM users WHERE id = ?").get(decoded.userId) as any;
-    
+    const user = db.prepare("SELECT id, username, email, createdAt, isAdmin FROM users WHERE id = ?").get(decoded.userId) as any;
+
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json(user);
+    res.json({ ...user, isAdmin: !!user.isAdmin });
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });
   }

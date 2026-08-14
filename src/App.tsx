@@ -691,7 +691,7 @@ export default function App() {
             </button>
             <div className="flex items-center gap-1 md:gap-2.5">
               <div className="text-right hidden sm:block">
-                <span className="text-[9px] text-indigo-400 dark:text-indigo-400 block font-mono uppercase tracking-wider">AUTHORIZED DEV</span>
+                <span className="text-[9px] text-indigo-400 dark:text-indigo-400 block font-mono uppercase tracking-wider">{user?.isAdmin ? "ADMIN" : "AUTHORIZED DEV"}</span>
                 <span className="text-xs font-semibold text-white dark:text-slate-200 block tracking-tight">{user?.username}</span>
               </div>
               <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-sm shrink-0">

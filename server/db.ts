@@ -211,4 +211,15 @@ if (pending.length > 0) {
   console.log("✅ Migration complete\n");
 }
 
+// ── Admin role ────────────────────────────────────────────────────────────────
+// SQLite's ALTER TABLE ADD COLUMN is a lightweight, non-rebuilding operation —
+// unlike the composite-key migration above, no backup/VACUUM/rebuild is needed.
+// Still guard it via table_info so it's safe/idempotent to run on every boot.
+const userColumns = db.pragma("table_info(users)") as ColumnInfo[];
+if (!userColumns.some((c) => c.name === "isAdmin")) {
+  console.log("🔧 Adding isAdmin column to users...");
+  db.exec(`ALTER TABLE users ADD COLUMN isAdmin INTEGER NOT NULL DEFAULT 0`);
+  console.log("  ✓ users.isAdmin added (default 0)\n");
+}
+
 export default db;

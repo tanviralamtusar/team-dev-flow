@@ -1,21 +1,23 @@
 import { Router, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import db from "../db.js";
-import { AuthRequest } from "../middleware/auth.js";
+import { AuthRequest, isUserAdmin } from "../middleware/auth.js";
 
 const router = Router();
 
 const activeUsers: Record<string, Record<string, number>> = {};
 
-// GET /api/projects - List projects user is member of
+// GET /api/projects - List projects user is member of (or ALL projects if admin)
 router.get("/", (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    const projects = db.prepare(`
-      SELECT p.* FROM projects p
-      JOIN project_members pm ON p.id = pm.projectId
-      WHERE pm.userId = ?
-    `).all(userId);
+    const projects = isUserAdmin(userId)
+      ? db.prepare(`SELECT * FROM projects`).all()
+      : db.prepare(`
+          SELECT p.* FROM projects p
+          JOIN project_members pm ON p.id = pm.projectId
+          WHERE pm.userId = ?
+        `).all(userId);
     
     const now = Date.now();
     const enrichedProjects = projects.map((p: any) => {

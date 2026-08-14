@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
 import db from "../db.js";
-import { AuthRequest } from "./auth.js";
+import { AuthRequest, isUserAdmin } from "./auth.js";
 
 export const verifyProjectMember = (req: AuthRequest, res: Response, next: NextFunction) => {
   const projectId = req.query.projectId || req.body.projectId;
@@ -11,6 +11,8 @@ export const verifyProjectMember = (req: AuthRequest, res: Response, next: NextF
   }
 
   try {
+    if (isUserAdmin(userId)) return next();
+
     const member = db.prepare("SELECT * FROM project_members WHERE projectId = ? AND userId = ?").get(projectId, userId);
     if (!member) {
       return res.status(403).json({ error: "You are not a member of this project" });
